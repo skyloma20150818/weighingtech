@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+@theme {
+  --color-on-surface-variant: #424750;
+  --color-on-secondary: #ffffff;
+  --color-on-tertiary-container: #ffc291;
+  --color-on-tertiary-fixed: #2e1500;
+  --color-surface-variant: #e2e2e6;
+  --color-error-container: #ffdad6;
+  --color-tertiary-container: #864800;
+  --color-secondary: #4d6079;
+  --color-tertiary-fixed: #ffdcc2;
+  --color-surface-container-highest: #e2e2e6;
+  --color-background: #f9f9fd;
+  --color-inverse-on-surface: #f0f0f4;
+  --color-on-secondary-fixed-variant: #354860;
+  --color-on-primary-fixed: #001c38;
+  --color-on-surface: #191c1e;
+  --color-on-primary: #ffffff;
+  --color-inverse-primary: #a1c9ff;
+  --color-surface-container-low: #f3f3f7;
+  --color-secondary-fixed: #d2e4ff;
+  --color-primary-fixed: #d2e4ff;
+  --color-on-error: #ffffff;
+  --color-tertiary: #643400;
+  --color-on-primary-fixed-variant: #004880;
+  --color-primary: #004276;
+  --color-on-secondary-fixed: #071c32;
+  --color-tertiary-fixed-dim: #ffb77b;
+  --color-primary-fixed-dim: #a1c9ff;
+  --color-on-secondary-container: #51647d;
+  --color-surface: #f9f9fd;
+  --color-inverse-surface: #2e3133;
+  --color-surface-bright: #f9f9fd;
+  --color-on-error-container: #93000a;
+  --color-on-tertiary-fixed-variant: #6d3a00;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-tint: #24609d;
+  --color-on-tertiary: #ffffff;
+  --color-primary-container: #1a5a96;
+  --color-error: #ba1a1a;
+  --color-surface-container: #edeef1;
+  --color-on-background: #191c1e;
+  --color-on-primary-container: #b0d1ff;
+  --color-surface-container-high: #e7e8eb;
+  --color-secondary-container: #cee1ff;
+  --color-outline-variant: #c2c7d1;
+  --color-outline: #727781;
+  --color-surface-dim: #d9dadd;
+  --color-secondary-fixed-dim: #b5c8e5;
+
+  --font-headline: "Manrope", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-label: "Inter", sans-serif;
+  --font-sans: "Inter", "Alibaba PuHuiTi", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer utilities {
+  .glass-nav {
+    background: rgba(249, 249, 253, 0.8);
+    backdrop-filter: blur(12px);
+  }
+  .primary-gradient {
+    background: linear-gradient(135deg, #004276 0%, #1a5a96 100%);
+  }
+  .ghost-border {
+    border: 1px solid rgba(194, 199, 209, 0.2);
+  }
+  .ambient-shadow {
+    box-shadow: 0 20px 50px rgba(25, 28, 30, 0.06);
+  }
+}
+@font-face {
+  font-family: 'Alibaba PuHuiTi';
+  src: url('/fonts/AlibabaPuHuiTi-2-55-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Alibaba PuHuiTi';
+  src: url('/fonts/AlibabaPuHuiTi-3-45-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  font-family: "Alibaba PuHuiTi", "Inter", sans-serif;
+  background-color: #F8FAFC;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Hide scrollbar for horizontal scrolling areas */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}

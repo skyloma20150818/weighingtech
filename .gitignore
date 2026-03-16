@@ -1,0 +1,44 @@
+# dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# build
+.next/
+out/
+dist/
+build/
+*.zip
+*.tar
+*.b64
+
+# misc
+.DS_Store
+*.pem
+*.log
+*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# env
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# OpenClaw
+.claude/
+.omc/
+*.skill
+
+# Temp
+app.b64
+metadata.json
+tsconfig.tsbuildinfo
+update_data.js
+home/
