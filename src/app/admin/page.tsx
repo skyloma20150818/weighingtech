@@ -9,8 +9,28 @@ export const dynamic = 'force-dynamic';
 import {
   Save, Upload, Plus, Trash2, Edit2, ChevronRight,
   Settings, Package, FolderOpen, Image as ImageIcon,
-  Phone, Globe, AlertCircle, CheckCircle2, X, Download,
-  RotateCcw, FileText, Monitor, Users, LayoutGrid
+  Phone, Globe, AlertCircle, CheckCircle, CheckCircle2, X, Download,
+  RotateCcw, Monitor, Users, LayoutGrid,
+  Star, Zap, Shield, Target, Wifi, Cpu, Server, Database,
+  Lock, Unlock, Eye, Fingerprint, Activity, Box, Truck,
+  Factory, Cog, Gauge, Thermometer, Signal, Battery,
+  Cloud, HardDrive, Laptop, Smartphone, Tablet, Printer,
+  Camera, Video, Music, Mic, Volume2, WifiOff, Bluetooth,
+  Mail, MessageSquare, PhoneCall, MapPin, Calendar, Clock,
+  User, Users as Users2, UserCheck, UserPlus, Award, Medal,
+  TrendingUp, TrendingDown, BarChart2, PieChart, LineChart,
+  RefreshCw, Repeat, XCircle, AlertTriangle, Info,
+  HelpCircle, Book, BookOpen, GraduationCap, Lightbulb, Rocket,
+  Globe2, Map, Navigation, Compass, Anchor, Ship, Plane, Car,
+  Bike, Footprints, Home, Building, Building2, Warehouse,
+  ShoppingCart, CreditCard, Wallet, DollarSign, Percent,
+  Tag, Gift, Heart, ThumbsUp, Share2, Link, ExternalLink,
+  Send, Inbox, Mailbox, Paperclip, File, FileText, Folder,
+  Archive, Grid, List, Layout, Maximize2, Minimize2, ZoomIn,
+  ZoomOut, Move, Drag, MousePointer, Hand, Crosshair, Edit3,
+  Eraser, Highlighter, Type, Bold, Italic, Underline, Strikethrough,
+  AlignLeft, AlignCenter, AlignRight, AlignJustify, ListOrdered,
+  ListBullet, Indent, Outdent, Quote, Code, Brackets
 } from 'lucide-react';
 import Editor from 'react-simple-wysiwyg';
 
@@ -1222,12 +1242,9 @@ function FeaturesSectionEditor({ config, updateConfig }: any) {
               </button>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">图标名称</label>
-                  <input
-                    className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
-                    value={feature.icon || ''}
-                    onChange={e => updateFeature(i, 'icon', e.target.value)}
-                    placeholder="如: Star, Zap, Shield"
+                  <IconPicker
+                    value={feature.icon || 'Star'}
+                    onChange={icon => updateFeature(i, 'icon', icon)}
                   />
                 </div>
                 <div></div>
@@ -1525,11 +1542,137 @@ function SectionsSectionEditor({ config, updateConfig, data }: any) {
   );
 }
 
-// Star icon for features
-function Star({ size, className }: { size: number; className?: string }) {
+/* ==================== 图标选择器 ==================== */
+const ICON_LIST = [
+  { name: 'Star', icon: Star },
+  { name: 'Zap', icon: Zap },
+  { name: 'Shield', icon: Shield },
+  { name: 'Target', icon: Target },
+  { name: 'Wifi', icon: Wifi },
+  { name: 'Cpu', icon: Cpu },
+  { name: 'Server', icon: Server },
+  { name: 'Database', icon: Database },
+  { name: 'Lock', icon: Lock },
+  { name: 'Unlock', icon: Unlock },
+  { name: 'Eye', icon: Eye },
+  { name: 'Fingerprint', icon: Fingerprint },
+  { name: 'Activity', icon: Activity },
+  { name: 'Box', icon: Box },
+  { name: 'Truck', icon: Truck },
+  { name: 'Factory', icon: Factory },
+  { name: 'Cog', icon: Cog },
+  { name: 'Gauge', icon: Gauge },
+  { name: 'Thermometer', icon: Thermometer },
+  { name: 'Signal', icon: Signal },
+  { name: 'Battery', icon: Battery },
+  { name: 'Cloud', icon: Cloud },
+  { name: 'HardDrive', icon: HardDrive },
+  { name: 'Laptop', icon: Laptop },
+  { name: 'Smartphone', icon: Smartphone },
+  { name: 'Camera', icon: Camera },
+  { name: 'Video', icon: Video },
+  { name: 'Volume2', icon: Volume2 },
+  { name: 'Mail', icon: Mail },
+  { name: 'MessageSquare', icon: MessageSquare },
+  { name: 'PhoneCall', icon: PhoneCall },
+  { name: 'MapPin', icon: MapPin },
+  { name: 'User', icon: User },
+  { name: 'Users', icon: Users2 },
+  { name: 'Award', icon: Award },
+  { name: 'Medal', icon: Medal },
+  { name: 'TrendingUp', icon: TrendingUp },
+  { name: 'BarChart', icon: BarChart2 },
+  { name: 'RefreshCw', icon: RefreshCw },
+  { name: 'CheckCircle', icon: CheckCircle },
+  { name: 'AlertCircle', icon: AlertCircle },
+  { name: 'Info', icon: Info },
+  { name: 'HelpCircle', icon: HelpCircle },
+  { name: 'Lightbulb', icon: Lightbulb },
+  { name: 'Rocket', icon: Rocket },
+  { name: 'Globe', icon: Globe },
+  { name: 'Compass', icon: Compass },
+  { name: 'Car', icon: Car },
+  { name: 'Home', icon: Home },
+  { name: 'Building', icon: Building },
+  { name: 'ShoppingCart', icon: ShoppingCart },
+  { name: 'Tag', icon: Tag },
+  { name: 'Heart', icon: Heart },
+  { name: 'ThumbsUp', icon: ThumbsUp },
+  { name: 'Share2', icon: Share2 },
+  { name: 'Gift', icon: Gift },
+  { name: 'File', icon: File },
+  { name: 'FileText', icon: FileText },
+  { name: 'Grid', icon: Grid },
+  { name: 'Layout', icon: Layout },
+  { name: 'Maximize', icon: Maximize2 },
+  { name: 'ZoomIn', icon: ZoomIn },
+  { name: 'Edit', icon: Edit2 },
+  { name: 'Settings', icon: Settings },
+];
+
+function IconPicker({ value, onChange }: { value: string; onChange: (icon: string) => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState('');
+
+  const filteredIcons = ICON_LIST.filter(i =>
+    i.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const selectedIcon = ICON_LIST.find(i => i.name === value);
+
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-    </svg>
+    <div className="relative">
+      <label className="block text-xs text-slate-400 mb-1">选择图标</label>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none flex items-center gap-2 bg-white hover:bg-slate-50"
+      >
+        {selectedIcon ? (
+          <>
+            <selectedIcon.icon size={18} className="text-[#2B4A7A]" />
+            <span>{value}</span>
+          </>
+        ) : (
+          <span className="text-slate-400">点击选择图标</span>
+        )}
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-50 mt-1 w-80 bg-white border rounded-xl shadow-lg max-h-64 flex flex-col">
+          <div className="p-2 border-b">
+            <input
+              type="text"
+              placeholder="搜索图标..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+              autoFocus
+            />
+          </div>
+          <div className="flex-1 overflow-y-auto p-2">
+            <div className="grid grid-cols-6 gap-1">
+              {filteredIcons.map(item => (
+                <button
+                  key={item.name}
+                  type="button"
+                  onClick={() => {
+                    onChange(item.name);
+                    setIsOpen(false);
+                    setSearch('');
+                  }}
+                  className={`p-2 rounded-lg hover:bg-slate-100 flex items-center justify-center ${
+                    value === item.name ? 'bg-blue-50 ring-1 ring-blue-400' : ''
+                  }`}
+                  title={item.name}
+                >
+                  <item.icon size={18} className="text-slate-600" />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

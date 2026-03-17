@@ -88,7 +88,7 @@ export const getSiteConfig = unstable_cache(
     };
   },
   ['site-config'],
-  { revalidate: 3600 }
+  { tags: ['site-config'], revalidate: 3600 }
 );
 
 export const getContact = async () => {

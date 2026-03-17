@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Play, ShieldCheck, Cpu, Server, Monitor, Smartphone,
   CheckCircle2, FlaskConical, Globe, Share2, Phone, ArrowUpRight,
-  CheckCircle, Settings, Wrench, Image as ImageIcon, ZoomIn, RefreshCw, X
+  CheckCircle, Settings, Wrench, Image as ImageIcon, ZoomIn, RefreshCw, X,
+  Volume2, VolumeX
 } from 'lucide-react';
 import Product360Viewer from '../components/Product360Viewer';
 import { useRouter } from 'next/navigation';
@@ -81,6 +82,14 @@ export default function HomeClient({ initialData }: HomeClientProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [selected360Product, setSelected360Product] = useState<Product | null>(null);
+  const [isMuted, setIsMuted] = useState(true); // 默认静音
+
+  const toggleMute = () => {
+    if (heroVideoRef.current) {
+      heroVideoRef.current.muted = !heroVideoRef.current.muted;
+      setIsMuted(heroVideoRef.current.muted);
+    }
+  };
 
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string, href: string) => {
     e.preventDefault();
@@ -149,12 +158,7 @@ export default function HomeClient({ initialData }: HomeClientProps) {
 
             {/* Right Image/Video */}
             <div
-              className="relative rounded-3xl overflow-hidden shadow-[0_20px_50px_rgb(0,0,0,0.1)] group cursor-pointer border-4 border-white h-[460px] bg-slate-100"
-              onClick={() => {
-                if (hero?.videoUrl) {
-                  setSelectedVideo(hero.videoUrl);
-                }
-              }}
+              className="relative rounded-3xl overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.25),0_10px_20px_-5px_rgba(0,0,0,0.1)] group border-4 border-white bg-slate-100 aspect-video"
             >
               {hero?.videoUrl ? (
                 <>
@@ -166,7 +170,29 @@ export default function HomeClient({ initialData }: HomeClientProps) {
                     autoPlay
                     loop
                     playsInline
+                    muted={isMuted}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      // 不全屏播放，只打开视频弹窗
+                      setSelectedVideo(hero.videoUrl);
+                    }}
+                    onDoubleClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
                   />
+                  {/* 静音按钮 */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleMute();
+                    }}
+                    className="absolute bottom-4 right-4 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors z-10"
+                    title={isMuted ? '开启声音' : '静音'}
+                  >
+                    {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                  </button>
                   <div className="absolute inset-0 bg-slate-900/10 transition-colors"></div>
                 </>
               ) : (

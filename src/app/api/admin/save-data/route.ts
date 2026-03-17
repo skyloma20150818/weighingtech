@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '../../../../lib/prisma';
 import { auth } from '../../../../auth';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 export async function GET() {
   const session = await auth();
@@ -146,6 +147,10 @@ export async function POST(request: NextRequest) {
         }
       }
     });
+
+    // 清除缓存
+    revalidateTag('site-config');
+    revalidatePath('/');
 
     return NextResponse.json({ success: true });
   } catch (e: any) {
