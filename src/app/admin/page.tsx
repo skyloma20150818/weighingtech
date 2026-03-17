@@ -25,19 +25,14 @@ export default function DevEditor() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [activeTab, setActiveTab] = useState('products');
 
-  // 开发环境检查
-  useEffect(() => {
-    if (process.env.NODE_ENV !== 'development') {
-      router.push('/');
-    }
-  }, [router]);
+  // Admin Editor access is protected by middleware
   const [editingItem, setEditingItem] = useState<{ index: number; data: any } | null>(null);
 
   useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
     try {
-      const res = await fetch('/api/dev/save-data');
+      const res = await fetch('/api/admin/save-data');
       if (res.ok) setData(await res.json());
       else showMsg('error', '无法加载数据');
     } catch (e) {
@@ -55,7 +50,7 @@ export default function DevEditor() {
   const handleSave = useCallback(async (newData = data) => {
     setSaving(true);
     try {
-      const res = await fetch('/api/dev/save-data', {
+      const res = await fetch('/api/admin/save-data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newData),
@@ -72,7 +67,7 @@ export default function DevEditor() {
     fd.append('file', file);
     fd.append('category', category);
     try {
-      const res = await fetch('/api/dev/upload', { method: 'POST', body: fd });
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
       if (res.ok) return (await res.json()).url;
     } catch (e) { console.error(e); }
     return null;
@@ -110,7 +105,7 @@ export default function DevEditor() {
       <aside className="w-56 bg-[#1a2e4a] text-white flex flex-col fixed h-full z-10">
         <div className="p-5 border-b border-white/10 flex items-center gap-2.5">
           <Settings size={20} />
-          <h1 className="text-base font-bold">数据管理后台</h1>
+          <h1 className="text-base font-bold">后台管理系统</h1>
         </div>
         <nav className="flex-1 p-3 space-y-1">
           {tabs.map(tab => (
@@ -128,7 +123,7 @@ export default function DevEditor() {
           ))}
         </nav>
         <div className="p-4 border-t border-white/10 text-[11px] text-blue-300 leading-relaxed">
-          ⚠️ 仅限开发环境使用
+          唯英科技 版权所有
         </div>
       </aside>
 
@@ -137,7 +132,7 @@ export default function DevEditor() {
         <header className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-xl font-bold text-slate-800">{tabs.find(t => t.id === activeTab)?.label}</h2>
-            <p className="text-xs text-slate-400 mt-0.5">修改将自动同步到 src/data.json</p>
+            <p className="text-xs text-slate-400 mt-0.5">修改将同步同步到数据库</p>
           </div>
           <div className="flex items-center gap-3">
             <a href="/" className="text-sm text-[#2B4A7A] hover:underline">← 返回前台</a>
@@ -637,7 +632,7 @@ function ProductForm({ data, item, onClose, onSave, upload }: any) {
     if (!code) return;
     setLoading360(true);
     try {
-      const res = await fetch(`/api/dev/upload-360?productCode=${encodeURIComponent(code)}`);
+      const res = await fetch(`/api/admin/upload-360?productCode=${encodeURIComponent(code)}`);
       if (res.ok) {
         const { files, count } = await res.json();
         setImages360(files);
@@ -657,7 +652,7 @@ function ProductForm({ data, item, onClose, onSave, upload }: any) {
       const fd = new FormData();
       fd.append('productCode', form.code);
       Array.from(files).forEach(f => fd.append('files', f));
-      const res = await fetch('/api/dev/upload-360', { method: 'POST', body: fd });
+      const res = await fetch('/api/admin/upload-360', { method: 'POST', body: fd });
       if (res.ok) {
         await load360Images(form.code);
       }
@@ -665,7 +660,7 @@ function ProductForm({ data, item, onClose, onSave, upload }: any) {
   };
 
   const delete360Image = async (filename: string) => {
-    const res = await fetch('/api/dev/upload-360', {
+    const res = await fetch('/api/admin/upload-360', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ productCode: form.code, filename }),

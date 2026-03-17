@@ -2,14 +2,16 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { contact, consult } from '../data';
+import { Contact, Consult } from '../data';
 import { Language, translations } from '../i18n';
 
 interface FooterProps {
   lang: Language;
+  contact?: Contact | null;
+  consult?: Consult | null;
 }
 
-export default function Footer({ lang }: FooterProps) {
+export default function Footer({ lang, contact, consult }: FooterProps) {
   const t = translations[lang];
 
   return (

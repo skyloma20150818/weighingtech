@@ -1,0 +1,620 @@
+{
+  "consult": {
+    "title": "在线咨询",
+    "description": "扫码添加专属客服，获取详细报价与方案",
+    "wechat": {
+      "enabled": true,
+      "label": "微信客服",
+      "qrImage": ""
+    },
+    "qq": {
+      "enabled": true,
+      "number": "",
+      "label": "QQ客服",
+      "qrImage": ""
+    }
+  },
+  "contact": {
+    "phone": "023-68283031",
+    "mobile": "13696475082",
+    "email": "",
+    "address": "重庆市北碚区龙凤桥街道龙凤三村200号附16号"
+  },
+  "categories": [
+    {
+      "id": "all",
+      "name": "全部",
+      "nameEn": "All"
+    },
+    {
+      "id": "platform_scale",
+      "name": "平台称仪表",
+      "nameEn": "Platform Scale"
+    },
+    {
+      "id": "junction_box",
+      "name": "接线盒",
+      "nameEn": "Junction Box"
+    },
+    {
+      "id": "digital_indicator",
+      "name": "数字式仪表",
+      "nameEn": "Digital Indicator"
+    },
+    {
+      "id": "digital_module",
+      "name": "数字模块",
+      "nameEn": "Digital Module"
+    },
+    {
+      "id": "wireless_terminal",
+      "name": "无线终端",
+      "nameEn": "Wireless Terminal"
+    },
+    {
+      "id": "axle_id",
+      "name": "轮轴识别仪",
+      "nameEn": "Axle ID"
+    },
+    {
+      "id": "accessories",
+      "name": "其他配件",
+      "nameEn": "Accessories"
+    }
+  ],
+  "albumCategories": [
+    {
+      "id": "all",
+      "name": "全部",
+      "nameEn": "All"
+    },
+    {
+      "id": "honors",
+      "name": "企业荣誉",
+      "nameEn": "Honors"
+    },
+    {
+      "id": "patents",
+      "name": "专利证书",
+      "nameEn": "Patents"
+    },
+    {
+      "id": "certifications",
+      "name": "资质认证",
+      "nameEn": "Certifications"
+    },
+    {
+      "id": "team",
+      "name": "团队风采",
+      "nameEn": "Team"
+    }
+  ],
+  "solutionCategories": [
+    {
+      "id": "all",
+      "name": "全部",
+      "nameEn": "All"
+    },
+    {
+      "id": "anti_cheat_demo",
+      "name": "防作弊演示",
+      "nameEn": "Anti-Cheat Demo"
+    },
+    {
+      "id": "unattended",
+      "name": "无人值守",
+      "nameEn": "Unattended"
+    },
+    {
+      "id": "case_studies",
+      "name": "客户案例",
+      "nameEn": "Case Studies"
+    },
+    {
+      "id": "system_ops",
+      "name": "系统操作",
+      "nameEn": "System Ops"
+    }
+  ],
+  "solutionVideos": [
+    {
+      "id": "v1",
+      "title": "智能AI视觉防作弊演示",
+      "titleEn": "Smart AI Vision Anti-Cheat Demo",
+      "category": "anti_cheat_demo",
+      "thumbnail": "/uploads/videos/cctv.mp4",
+      "videoUrl": "/uploads/videos/cctv.mp4"
+    },
+    {
+      "id": "v2",
+      "title": "无人值守地磅系统全流程",
+      "titleEn": "Unattended Weighbridge System Process",
+      "category": "unattended",
+      "thumbnail": "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=600",
+      "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+    },
+    {
+      "id": "v3",
+      "title": "大型化工厂称重改造案例",
+      "titleEn": "Large Chemical Plant Weighing Retrofit",
+      "category": "case_studies",
+      "thumbnail": "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=600",
+      "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+    },
+    {
+      "id": "v4",
+      "title": "防遥控报警系统实测",
+      "titleEn": "Anti-Remote Control Alarm System Test",
+      "category": "anti_cheat_demo",
+      "thumbnail": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=600",
+      "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+    },
+    {
+      "id": "v5",
+      "title": "称重管理软件操作指南",
+      "titleEn": "Weighing Management Software Guide",
+      "category": "system_ops",
+      "thumbnail": "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&q=80&w=600",
+      "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+    },
+    {
+      "id": "v6",
+      "title": "港口多车道并发称重案例",
+      "titleEn": "Port Multi-Lane Concurrent Weighing",
+      "category": "case_studies",
+      "thumbnail": "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?auto=format&fit=crop&q=80&w=600",
+      "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+    },
+    {
+      "id": "v7",
+      "title": "红外防压边功能演示",
+      "titleEn": "Infrared Anti-Edge Pressing Demo",
+      "category": "anti_cheat_demo",
+      "thumbnail": "https://images.unsplash.com/photo-1581092335397-9583eb92d232?auto=format&fit=crop&q=80&w=600",
+      "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+    },
+    {
+      "id": "v8",
+      "title": "移动端APP远程监控教学",
+      "titleEn": "Mobile APP Remote Monitoring Tutorial",
+      "category": "system_ops",
+      "thumbnail": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=600",
+      "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4"
+    }
+  ],
+  "companyAlbum": [
+    {
+      "id": "a1",
+      "title": "高新技术企业证书",
+      "titleEn": "High-Tech Enterprise Certificate",
+      "category": "certifications",
+      "image": "/uploads/albums/微信图片_20260209203857_57_321.png"
+    },
+    {
+      "id": "a2",
+      "title": "ISO9001质量管理体系认证",
+      "titleEn": "ISO9001 Quality Management Certification",
+      "category": "certifications",
+      "image": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=600"
+    },
+    {
+      "id": "a3",
+      "title": "实用新型专利证书 - 智能称重",
+      "titleEn": "Utility Model Patent - Smart Weighing",
+      "category": "patents",
+      "image": "https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?auto=format&fit=crop&q=80&w=600"
+    },
+    {
+      "id": "a4",
+      "title": "发明专利 - 高精度传感器",
+      "titleEn": "Invention Patent - High Precision Sensor",
+      "category": "patents",
+      "image": "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=600"
+    },
+    {
+      "id": "a5",
+      "title": "年度优秀科技创新企业",
+      "titleEn": "Outstanding Tech Innovation Enterprise",
+      "category": "honors",
+      "image": "https://images.unsplash.com/photo-1561489413-985b06da5bee?auto=format&fit=crop&q=80&w=600"
+    },
+    {
+      "id": "a6",
+      "title": "研发团队合影",
+      "titleEn": "R&D Team Group Photo",
+      "category": "team",
+      "image": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=600"
+    },
+    {
+      "id": "a7",
+      "title": "软件著作权登记证书",
+      "titleEn": "Software Copyright Registration",
+      "category": "patents",
+      "image": "https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?auto=format&fit=crop&q=80&w=600"
+    },
+    {
+      "id": "a8",
+      "title": "行业协会理事单位",
+      "titleEn": "Industry Association Council Member",
+      "category": "honors",
+      "image": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=600"
+    }
+  ],
+  "products": [
+    {
+      "id": "422",
+      "name": "XK-T680A",
+      "nameEn": "XK-T680A",
+      "category": "platform_scale",
+      "description": "高性能平台称仪表，支持多种协议AAAAA",
+      "descriptionEn": "High-performance platform scale indicator, supports multiple protocols",
+      "image": "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=600",
+      "has360": true,
+      "images360Count": 36,
+      "code": "XK-T680A",
+      "manualUrl": "/manuals/XK-T680A.pdf",
+      "documents": [
+        {
+          "title": "",
+          "format": "JPG",
+          "fileSize": "",
+          "url": "/uploads/documents/logo.png"
+        }
+      ]
+    },
+    {
+      "id": "420",
+      "name": "XK-T680B",
+      "nameEn": "XK-T680B",
+      "category": "platform_scale",
+      "description": "工业级平台称仪表，稳定可靠",
+      "descriptionEn": "Industrial platform scale indicator, stable and reliable",
+      "image": "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=600",
+      "has360": true,
+      "images360Count": 36,
+      "code": "XK-T680B",
+      "manualUrl": "/manuals/XK-T680B.pdf",
+      "specs": [
+        {
+          "label": "显示精度",
+          "labelEn": "Display Resolution",
+          "value": "1/30000"
+        },
+        {
+          "label": "称量范围",
+          "labelEn": "Weighing Range",
+          "value": "0~3t"
+        },
+        {
+          "label": "传感器电压",
+          "labelEn": "Sensor Voltage",
+          "value": "DC 5V"
+        },
+        {
+          "label": "工作温度",
+          "labelEn": "Operating Temp",
+          "value": "-10°C ~ 40°C"
+        },
+        {
+          "label": "通信接口",
+          "labelEn": "Communication",
+          "value": "RS485/232"
+        }
+      ],
+      "documents": [
+        {
+          "title": "产品说明书",
+          "titleEn": "Product Manual",
+          "description": "XK-T680B 系列的详细安装指南和操作说明",
+          "descriptionEn": "Detailed installation guide and operation manual for XK-T680B series",
+          "fileSize": "12.4 MB",
+          "format": "PDF",
+          "url": "/manuals/XK-T680B.pdf"
+        },
+        {
+          "title": "技术规格书",
+          "titleEn": "Technical Specifications",
+          "description": "包含完整的技术参数和电气接线图",
+          "descriptionEn": "Complete technical parameters and electrical wiring diagrams",
+          "fileSize": "3.2 MB",
+          "format": "PDF",
+          "url": "/manuals/XK-T680B-specs.pdf"
+        },
+        {
+          "title": "使用案例",
+          "titleEn": "Case Studies",
+          "description": "各行业实际应用案例和解决方案",
+          "descriptionEn": "Industry application cases and solutions",
+          "fileSize": "8.5 MB",
+          "format": "PDF",
+          "url": "/manuals/XK-T680B-cases.pdf"
+        }
+      ]
+    },
+    {
+      "id": "419",
+      "name": "XK-T660B",
+      "nameEn": "XK-T660B",
+      "category": "platform_scale",
+      "description": "高精度平台称仪表",
+      "descriptionEn": "High-precision platform scale indicator",
+      "image": "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=600",
+      "code": "XK-T660B",
+      "manualUrl": "/manuals/XK-T660B.pdf"
+    },
+    {
+      "id": "418",
+      "name": "XK-T680D",
+      "nameEn": "XK-T680D",
+      "category": "platform_scale",
+      "description": "多功能平台称仪表",
+      "descriptionEn": "Multi-functional platform scale indicator",
+      "image": "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=600",
+      "code": "XK-T680D",
+      "manualUrl": "/manuals/XK-T680D.pdf"
+    },
+    {
+      "id": "417",
+      "name": "XK-T660D",
+      "nameEn": "XK-T660D",
+      "category": "platform_scale",
+      "description": "经济型平台称仪表",
+      "descriptionEn": "Economical platform scale indicator",
+      "image": "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=600",
+      "code": "XK-T660D",
+      "manualUrl": "/manuals/XK-T660D.pdf"
+    },
+    {
+      "id": "424",
+      "name": "模转数-塑料四线B",
+      "nameEn": "A/D Converter - Plastic 4-Wire B",
+      "category": "junction_box",
+      "description": "防水防尘塑料接线盒",
+      "descriptionEn": "Waterproof and dustproof plastic junction box",
+      "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=600",
+      "code": "A/D Converter - Plastic 4-Wire B",
+      "manualUrl": "/manuals/A/D Converter - Plastic 4-Wire B.pdf"
+    },
+    {
+      "id": "421",
+      "name": "模转数-塑料四线A",
+      "nameEn": "A/D Converter - Plastic 4-Wire A",
+      "category": "junction_box",
+      "description": "支持多协议，精度高",
+      "descriptionEn": "Supports multiple protocols, high precision",
+      "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=600",
+      "code": "A/D Converter - Plastic 4-Wire A",
+      "manualUrl": "/manuals/A/D Converter - Plastic 4-Wire A.pdf"
+    },
+    {
+      "id": "414",
+      "name": "T980",
+      "nameEn": "T980",
+      "category": "digital_indicator",
+      "description": "高端数字式称重仪表",
+      "descriptionEn": "High-end digital weighing indicator",
+      "image": "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&q=80&w=600",
+      "code": "T980",
+      "manualUrl": "/manuals/T980.pdf"
+    },
+    {
+      "id": "412",
+      "name": "D10",
+      "nameEn": "D10",
+      "category": "digital_indicator",
+      "description": "交直流/485信号防浪涌保护，光电隔离，直流防",
+      "descriptionEn": "AC/DC/485 surge protection, optoelectronic isolation",
+      "image": "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&q=80&w=600",
+      "code": "D10",
+      "manualUrl": "/manuals/D10.pdf"
+    },
+    {
+      "id": "413",
+      "name": "T811",
+      "nameEn": "T811",
+      "category": "digital_indicator",
+      "description": "智能数字式仪表",
+      "descriptionEn": "Smart digital indicator",
+      "image": "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&q=80&w=600",
+      "code": "T811",
+      "manualUrl": "/manuals/T811.pdf"
+    },
+    {
+      "id": "416",
+      "name": "B1",
+      "nameEn": "B1",
+      "category": "digital_module",
+      "description": "高精度数字转换模块",
+      "descriptionEn": "High-precision digital conversion module",
+      "image": "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?auto=format&fit=crop&q=80&w=600",
+      "code": "B1",
+      "manualUrl": "/manuals/B1.pdf"
+    },
+    {
+      "id": "415",
+      "name": "A1",
+      "nameEn": "A1",
+      "category": "digital_module",
+      "description": "标准数字转换模块",
+      "descriptionEn": "Standard digital conversion module",
+      "image": "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?auto=format&fit=crop&q=80&w=600",
+      "code": "A1",
+      "manualUrl": "/manuals/A1.pdf"
+    },
+    {
+      "id": "399",
+      "name": "数字式无线终端",
+      "nameEn": "Digital Wireless Terminal",
+      "category": "wireless_terminal",
+      "description": "支持多种通信协议，无线传输距离远，支持无线频段AAAAA",
+      "descriptionEn": "Supports multiple protocols, long wireless transmission distance",
+      "image": "https://images.unsplash.com/photo-1581092335397-9583eb92d232?auto=format&fit=crop&q=80&w=600",
+      "code": "Digital Wireless Terminal",
+      "manualUrl": "https://console.bce.baidu.com/qianfan/resource/subscribe?_=1773649403400",
+      "has360": false,
+      "images360Count": 0,
+      "specs": [],
+      "documents": []
+    },
+    {
+      "id": "425",
+      "name": "轮轴控制器",
+      "nameEn": "Axle Controller",
+      "category": "axle_id",
+      "description": "轴数车型识别，开关量信号输入，232/485结",
+      "descriptionEn": "Axle count and vehicle type recognition, switch signal input",
+      "image": "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=600",
+      "code": "Axle Controller",
+      "manualUrl": "/manuals/Axle Controller.pdf"
+    },
+    {
+      "id": "436",
+      "name": "电脑串口测试工具",
+      "nameEn": "PC Serial Port Test Tool",
+      "category": "accessories",
+      "description": "专业串口测试工具",
+      "descriptionEn": "Professional serial port testing tool",
+      "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=600",
+      "code": "PC Serial Port Test Tool",
+      "manualUrl": "/manuals/PC Serial Port Test Tool.pdf"
+    },
+    {
+      "id": "435",
+      "name": "W19",
+      "nameEn": "W19",
+      "category": "accessories",
+      "description": "融称重仪表、PC电脑、称重软件于一体，可远程查",
+      "descriptionEn": "Integrates weighing indicator, PC, and software, remote access",
+      "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=600",
+      "code": "W19",
+      "manualUrl": "/manuals/W19.pdf"
+    },
+    {
+      "id": "434",
+      "name": "D10+",
+      "nameEn": "D10+",
+      "category": "accessories",
+      "description": "远程故障诊断、称重记录查询、超载查询、质保到期",
+      "descriptionEn": "Remote fault diagnosis, weighing record query, overload query",
+      "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=600",
+      "code": "D10+",
+      "manualUrl": "/manuals/D10+.pdf"
+    },
+    {
+      "id": "433",
+      "name": "手持设备驱动",
+      "nameEn": "Handheld Device Driver",
+      "category": "accessories",
+      "description": "通用手持设备驱动程序",
+      "descriptionEn": "Universal handheld device driver program",
+      "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=600",
+      "code": "Handheld Device Driver",
+      "manualUrl": "/manuals/Handheld Device Driver.pdf"
+    },
+    {
+      "id": "432",
+      "name": "MODBUS协议接线盒",
+      "nameEn": "MODBUS Protocol Junction Box",
+      "category": "accessories",
+      "description": "采用MODBUS协议通信；具有8通道输入16通",
+      "descriptionEn": "Uses MODBUS protocol; 8-channel input, 16-channel output",
+      "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=600",
+      "code": "MODBUS Protocol Junction Box",
+      "manualUrl": "/manuals/MODBUS Protocol Junction Box.pdf"
+    },
+    {
+      "id": "431",
+      "name": "轮轴模块",
+      "nameEn": "Axle Module",
+      "category": "accessories",
+      "description": "高精度轮轴模块",
+      "descriptionEn": "High-precision axle module",
+      "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=600",
+      "code": "Axle Module",
+      "manualUrl": "/manuals/Axle Module.pdf"
+    },
+    {
+      "id": "430",
+      "name": "通信切换板",
+      "nameEn": "Communication Switch Board",
+      "category": "accessories",
+      "description": "切换万能传感器协议",
+      "descriptionEn": "Switch universal sensor protocols",
+      "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=600",
+      "code": "Communication Switch Board",
+      "manualUrl": "/manuals/Communication Switch Board.pdf"
+    },
+    {
+      "id": "429",
+      "name": "数字测试仪",
+      "nameEn": "Digital Tester",
+      "category": "accessories",
+      "description": "代表数字传感器,判断仪表正常",
+      "descriptionEn": "Represents digital sensor, judges indicator normality",
+      "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=600",
+      "code": "Digital Tester",
+      "manualUrl": "/manuals/Digital Tester.pdf"
+    },
+    {
+      "id": "428",
+      "name": "灵敏度测试仪",
+      "nameEn": "Sensitivity Tester",
+      "category": "accessories",
+      "description": "模拟传感器灵敏度测试",
+      "descriptionEn": "Simulates sensor sensitivity testing",
+      "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=600",
+      "code": "Sensitivity Tester",
+      "manualUrl": "/manuals/Sensitivity Tester.pdf"
+    },
+    {
+      "id": "427",
+      "name": "数字传感器维修工具",
+      "nameEn": "Digital Sensor Repair Tool",
+      "category": "accessories",
+      "description": "修改万能传感器协议",
+      "descriptionEn": "Modifies universal sensor protocols",
+      "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=600",
+      "code": "Digital Sensor Repair Tool",
+      "manualUrl": "/manuals/Digital Sensor Repair Tool.pdf"
+    },
+    {
+      "id": "426",
+      "name": "数字传感器",
+      "nameEn": "Digital Sensor",
+      "category": "accessories",
+      "description": "万能数字传感器",
+      "descriptionEn": "Universal digital sensor",
+      "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=600",
+      "code": "Digital Sensor",
+      "manualUrl": "/manuals/Digital Sensor.pdf"
+    },
+    {
+      "id": "423",
+      "name": "模转数-不锈钢八线",
+      "nameEn": "A/D Converter - Stainless 8-Wire",
+      "category": "accessories",
+      "description": "不锈钢八线模转数接线盒",
+      "descriptionEn": "Stainless steel 8-wire A/D converter junction box",
+      "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=600",
+      "code": "A/D Converter - Stainless 8-Wire",
+      "manualUrl": "/manuals/A/D Converter - Stainless 8-Wire.pdf"
+    },
+    {
+      "name": "测试产品",
+      "code": "Test",
+      "category": "platform_scale",
+      "description": "dsfsdfsd",
+      "image": "/uploads/products/微信图片_2026-01-20_142156_549.png",
+      "specs": [],
+      "documents": [
+        {
+          "title": "",
+          "format": "PDF",
+          "fileSize": "",
+          "url": "/uploads/documents/W19系列使用说明书_.pdf"
+        }
+      ],
+      "id": "1773655628049"
+    }
+  ]
+}

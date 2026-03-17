@@ -1,22 +1,42 @@
-import { use } from 'react';
-import { products } from '../../../data';
+import { getProducts, getProductById, getRecommendations, getConsult } from '../../../lib/data-fetcher';
 import ProductDetail from './ProductDetail';
-
-// 生成静态路由（静态导出需要）- 服务端函数
-export function generateStaticParams() {
-  return products.map((product) => ({
-    id: product.id,
-  }));
-}
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function ProductPage({ params }: PageProps) {
-  const { id } = use(params);
+export async function generateStaticParams() {
+  const products = await getProducts();
+  return products.map((product) => ({
+    id: product.id,
+  }));
+}
 
-  const product = products.find(p => p.id === id);
+export default async function ProductPage({ params }: PageProps) {
+  const { id } = await params;
 
-  return <ProductDetail product={product} productId={id} />;
+  const product = await getProductById(id);
+  
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">产品未找到</h1>
+        </div>
+      </div>
+    );
+  }
+
+  const [recommendations, consult] = await Promise.all([
+    getRecommendations(product.category, id),
+    getConsult()
+  ]);
+
+  return (
+    <ProductDetail 
+      product={product as any} 
+      consult={consult} 
+      recommendations={recommendations as any[]} 
+    />
+  );
 }

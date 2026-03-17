@@ -42,3 +42,5 @@ metadata.json
 tsconfig.tsbuildinfo
 update_data.js
 home/
+
+/src/generated/prisma

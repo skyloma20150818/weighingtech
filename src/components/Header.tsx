@@ -9,9 +9,10 @@ import { Language, translations } from '../i18n';
 interface HeaderProps {
   lang: Language;
   onLangChange: (lang: Language) => void;
+  phone?: string;
 }
 
-export default function Header({ lang, onLangChange }: HeaderProps) {
+export default function Header({ lang, onLangChange, phone }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const t = translations[lang];
@@ -70,7 +71,7 @@ export default function Header({ lang, onLangChange }: HeaderProps) {
           <div className="hidden md:flex items-center gap-6">
             <div className="text-right">
               <div className="text-sm text-slate-500">{t.nav.hotline}</div>
-              <div className="font-bold text-[#2B4A7A]">023-68283031</div>
+              <div className="font-bold text-[#2B4A7A]">{phone || '023-68283031'}</div>
             </div>
             <div className="flex bg-slate-100 rounded-lg p-1">
               <button

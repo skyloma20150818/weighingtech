@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id       String @id @default(cuid())
+  username String @unique
+  password String
+}
+
+model Category {
+  id     String @id
+  name   String
+  nameEn String
+}
+
+model AlbumCategory {
+  id     String @id
+  name   String
+  nameEn String
+}
+
+model SolutionCategory {
+  id     String @id
+  name   String
+  nameEn String
+}
+
+model Product {
+  id             String            @id
+  code           String
+  name           String
+  nameEn         String?
+  category       String
+  description    String
+  descriptionEn  String?
+  image          String
+  has360         Boolean?          @default(false)
+  images360Count Int?              @default(0)
+  manualUrl      String?
+  introImages    ProductImage[]
+  specs          ProductSpec[]
+  documents      ProductDocument[]
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  url       String
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductSpec {
+  id        String  @id @default(cuid())
+  label     String
+  labelEn   String
+  value     String
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductDocument {
+  id            String  @id @default(cuid())
+  title         String
+  titleEn       String?
+  description   String?
+  descriptionEn String?
+  docType       String?
+  format        String
+  fileSize      String?
+  url           String
+  productId     String
+  product       Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model AlbumItem {
+  id       String  @id
+  title    String
+  titleEn  String?
+  category String
+  image    String
+}
+
+model VideoItem {
+  id        String  @id
+  title     String
+  titleEn   String?
+  category  String
+  thumbnail String
+  videoUrl  String
+}
+
+model Contact {
+  id      Int     @id @default(1)
+  phone   String?
+  mobile  String?
+  email   String?
+  address String?
+}
+
+model Consult {
+  id          Int     @id @default(1)
+  title       String?
+  description String?
+  wechatEnabled Boolean? @default(false)
+  wechatLabel   String?
+  wechatQrImage String?
+  qqEnabled     Boolean? @default(false)
+  qqNumber      String?
+  qqLabel       String?
+  qqQrImage     String?
+}
+
+model About {
+  id            Int     @id @default(1)
+  description   String?
+  descriptionEn String?
+}
+
+model Hero {
+  id       Int     @id @default(1)
+  videoUrl String
+  poster   String?
+}
