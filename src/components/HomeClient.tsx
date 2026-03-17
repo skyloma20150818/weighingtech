@@ -2,17 +2,15 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Play, Eye, ShieldCheck, Cpu, Server, Monitor, Smartphone,
+  Play, ShieldCheck, Cpu, Server, Monitor, Smartphone,
   CheckCircle2, FlaskConical, Globe, Share2, Phone, ArrowUpRight,
   CheckCircle, Settings, Wrench, Image as ImageIcon, ZoomIn, RefreshCw, X
 } from 'lucide-react';
 import Product360Viewer from '../components/Product360Viewer';
-import ProductDetailModal from '../components/ProductDetailModal';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Language, translations } from '../i18n';
-import type { Category, VideoItem, AlbumItem, Product, Contact, Consult, About, Hero } from '../data';
-import Header from './Header';
-import Footer from './Footer';
+import type { Category, VideoItem, AlbumItem, Product, Contact, Consult, About, Hero, Feature } from '../data';
 import { useLanguage } from './LanguageContext';
 
 interface HomeClientProps {
@@ -27,6 +25,8 @@ interface HomeClientProps {
     consult: any; // Simplified for now
     about: About | null;
     hero: Hero | null;
+    features?: Feature[] | null;
+    sections?: any;
   };
 }
 
@@ -41,7 +41,9 @@ export default function HomeClient({ initialData }: HomeClientProps) {
     contact,
     consult,
     about,
-    hero
+    hero,
+    features,
+    sections
   } = initialData;
 
   const router = useRouter();
@@ -79,7 +81,6 @@ export default function HomeClient({ initialData }: HomeClientProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [selected360Product, setSelected360Product] = useState<Product | null>(null);
-  const [selectedProductDetail, setSelectedProductDetail] = useState<Product | null>(null);
 
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string, href: string) => {
     e.preventDefault();
@@ -117,10 +118,8 @@ export default function HomeClient({ initialData }: HomeClientProps) {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800">
-      <Header lang={lang} onLangChange={setLang} phone={contact?.phone} />
-
       {/* Hero Section */}
-      <section className="relative bg-white overflow-hidden">
+      <section id="home" className="relative bg-white overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-white/20 z-0"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -128,21 +127,22 @@ export default function HomeClient({ initialData }: HomeClientProps) {
             <div className="space-y-8">
               <div className="inline-flex items-center gap-2 bg-blue-50 text-[#2B4A7A] px-4 py-2 rounded-full text-sm font-medium border border-blue-100">
                 <CheckCircle size={16} />
-                <span>{t.hero.badge}</span>
+                <span>{lang === 'zh' ? (hero?.badge || t.hero.badge) : (hero?.badgeEn || t.hero.badge || t.hero.badge)}</span>
               </div>
               <h1 className="text-5xl lg:text-6xl font-bold leading-tight text-slate-900">
-                {t.hero.title1}<br />
-                <span className="text-[#2B4A7A]">{t.hero.title2}</span>{t.hero.title3}
+                {lang === 'zh' ? (hero?.title1 || t.hero.title1) : (hero?.title1En || t.hero.title1)}<br />
+                <span className="text-[#2B4A7A]">{lang === 'zh' ? (hero?.title2 || t.hero.title2) : (hero?.title2En || t.hero.title2)}</span>
+                {lang === 'zh' ? (hero?.title3 || t.hero.title3) : (hero?.title3En || t.hero.title3)}
               </h1>
               <p className="text-lg text-slate-600 max-w-lg leading-relaxed">
-                {t.hero.subtitle}
+                {lang === 'zh' ? (hero?.subtitle || t.hero.subtitle) : (hero?.subtitleEn || t.hero.subtitle)}
               </p>
               <div className="flex flex-wrap gap-4">
                 <a href="#products" className="bg-[#2B4A7A] text-white px-8 py-3.5 rounded-xl hover:bg-[#1C3359] transition-all duration-300 font-medium flex items-center gap-2 shadow-lg shadow-blue-900/20 hover:-translate-y-0.5">
-                  {t.hero.products} <ArrowUpRight size={18} />
+                  {hero?.productsLabel || t.hero.products} <ArrowUpRight size={18} />
                 </a>
                 <a href="#contact" className="bg-white text-slate-700 border border-slate-200 px-8 py-3.5 rounded-xl hover:bg-slate-50 transition-all duration-300 font-medium hover:-translate-y-0.5">
-                  {t.hero.contact}
+                  {hero?.contactLabel || t.hero.contact}
                 </a>
               </div>
             </div>
@@ -164,7 +164,6 @@ export default function HomeClient({ initialData }: HomeClientProps) {
                     poster={hero.poster || undefined}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     autoPlay
-                    muted
                     loop
                     playsInline
                   />
@@ -172,26 +171,18 @@ export default function HomeClient({ initialData }: HomeClientProps) {
                 </>
               ) : (
                 <>
-                  <img
+                  <Image
                     src={hero?.poster || "https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?auto=format&fit=crop&q=80&w=1200"}
                     alt="Industrial Weighing Scale"
+                    width={800}
+                    height={600}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    priority
                   />
                   <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-slate-900/30 transition-colors"></div>
                 </>
               )}
 
-              <div className="absolute bottom-6 left-6 right-6">
-                <div className="bg-white/90 backdrop-blur-md text-slate-900 px-6 py-4 rounded-2xl font-medium flex items-center justify-between shadow-lg">
-                  <div>
-                    <div className="text-sm text-slate-500 mb-1">{t.hero.videoLabel1}</div>
-                    <div className="font-bold text-base">{t.hero.videoLabel2}</div>
-                  </div>
-                  <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center">
-                    <ArrowUpRight className="text-[#2B4A7A]" size={20} />
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -202,8 +193,12 @@ export default function HomeClient({ initialData }: HomeClientProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
             <div>
-              <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">{t.sections.products}</h2>
-              <p className="text-slate-600">{t.sections.productsSub}</p>
+              <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">
+                {lang === 'zh' ? (sections?.products?.title || t.sections.products) : (sections?.products?.titleEn || t.sections.products)}
+              </h2>
+              <p className="text-slate-600">
+                {lang === 'zh' ? (sections?.products?.subtitle || t.sections.productsSub) : (sections?.products?.subtitleEn || t.sections.productsSub)}
+              </p>
             </div>
           </div>
 
@@ -224,27 +219,19 @@ export default function HomeClient({ initialData }: HomeClientProps) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredProducts.map((product) => (
-              <div key={product.id} className="bg-white rounded-2xl overflow-hidden group hover:shadow-[0_15px_40px_rgb(0,0,0,0.08)] transition-all duration-300 border border-slate-100 flex flex-col">
-                <div
-                  className="relative h-48 overflow-hidden bg-white p-4 cursor-pointer"
-                  onClick={() => router.push(`/product/${product.id}`)}
-                >
-                  <img
+              <div 
+                key={product.id} 
+                className="bg-white rounded-2xl overflow-hidden group hover:shadow-[0_15px_40px_rgb(0,0,0,0.08)] transition-all duration-300 border border-slate-100 flex flex-col cursor-pointer"
+                onClick={() => router.push(`/product/${product.id}`)}
+              >
+                <div className="relative h-48 overflow-hidden bg-white p-4">
+                  <Image
                     src={product.image}
                     alt={lang === 'en' && product.nameEn ? product.nameEn : product.name}
-                    loading="lazy"
-                    className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                    className="object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500 p-4"
                   />
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedProductDetail(product);
-                    }}
-                    className="absolute inset-0 m-auto w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-[#2B4A7A] shadow-lg z-20 hover:scale-110 hover:bg-white"
-                    title={lang === 'en' ? 'Quick View' : '快速预览'}
-                  >
-                    <Eye size={24} />
-                  </button>
 
                   {product.has360 && (
                     <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-[#2B4A7A] px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 shadow-sm z-10">
@@ -255,14 +242,15 @@ export default function HomeClient({ initialData }: HomeClientProps) {
                     {product.code || product.id}
                   </div>
                 </div>
-                <div className="p-5 cursor-pointer flex-1 flex flex-col" onClick={() => router.push(`/product/${product.id}`)}>
+                <div className="p-5 flex-1 flex flex-col">
                   <div className="text-xs font-medium text-[#2B4A7A] mb-2">
                     {lang === 'en'
                       ? categories.find(c => c.id === product.category)?.nameEn
                       : categories.find(c => c.id === product.category)?.name}
                   </div>
-                  <h4 className="text-lg font-bold text-slate-900 mb-2 truncate">{lang === 'en' && product.nameEn ? product.nameEn : product.name}</h4>
-                  <p className="text-sm text-slate-500 line-clamp-2 mb-4 h-10">{lang === 'en' && product.descriptionEn ? product.descriptionEn : product.description}</p>
+                  <h3 className="text-lg font-bold text-slate-900 group-hover:text-[#2B4A7A] transition-colors line-clamp-1">
+                    {lang === 'en' && product.nameEn ? product.nameEn : product.name}
+                  </h3>
                 </div>
               </div>
             ))}
@@ -273,12 +261,12 @@ export default function HomeClient({ initialData }: HomeClientProps) {
       {/* Solutions Video Gallery */}
       <section id="solutions" className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+            <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-blue-50 text-[#2B4A7A] px-4 py-2 rounded-full text-sm font-medium mb-4 border border-blue-100">
-              <ShieldCheck size={16} /> {t.sections.solutionsBadge}
+              <ShieldCheck size={16} /> {lang === 'zh' ? (sections?.solutions?.badge || t.sections.solutionsBadge) : (sections?.solutions?.badgeEn || t.sections.solutionsBadge)}
             </div>
-            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">{t.sections.solutions}</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">{t.sections.solutionsSub}</p>
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">{lang === 'zh' ? (sections?.solutions?.title || t.sections.solutions) : (sections?.solutions?.titleEn || t.sections.solutions)}</h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">{lang === 'zh' ? (sections?.solutions?.subtitle || t.sections.solutionsSub) : (sections?.solutions?.subtitleEn || t.sections.solutionsSub)}</p>
           </div>
 
           <div className="flex flex-wrap justify-center gap-2 mb-10">
@@ -304,11 +292,12 @@ export default function HomeClient({ initialData }: HomeClientProps) {
                 onClick={() => setSelectedVideo(item.videoUrl)}
               >
                 <div className="relative h-48 overflow-hidden">
-                  <img
+                  <Image
                     src={item.thumbnail}
                     alt={lang === 'en' && item.titleEn ? item.titleEn : item.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -334,10 +323,11 @@ export default function HomeClient({ initialData }: HomeClientProps) {
       {/* Customization Service */}
       <section className="py-24 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1581092335397-9583eb92d232?auto=format&fit=crop&q=80&w=2000"
             alt="Customization Background"
-            className="w-full h-full object-cover opacity-40"
+            fill
+            className="object-cover opacity-40"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-blue-50/95 via-white/95 to-slate-100/95 backdrop-blur-[2px]"></div>
         </div>
@@ -345,43 +335,61 @@ export default function HomeClient({ initialData }: HomeClientProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 bg-white text-[#2B4A7A] px-4 py-2 rounded-full text-sm font-medium mb-6 border border-blue-100 shadow-sm">
-              <Settings size={16} /> {t.sections.customizationBadge}
+              <Settings size={16} /> {lang === 'zh' ? (sections?.customization?.badge || t.sections.customizationBadge) : (sections?.customization?.badgeEn || t.sections.customizationBadge)}
             </div>
-            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-6">{t.sections.customization}</h2>
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-6">{lang === 'zh' ? (sections?.customization?.title || t.sections.customization) : (sections?.customization?.titleEn || t.sections.customization)}</h2>
             <p className="text-slate-600 text-lg max-w-3xl mx-auto leading-relaxed">
-              {t.sections.customizationSub}
+              {lang === 'zh' ? (sections?.customization?.subtitle || t.sections.customizationSub) : (sections?.customization?.subtitleEn || t.sections.customizationSub)}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <div className="bg-white/80 backdrop-blur-md border border-white shadow-xl shadow-slate-200/50 rounded-2xl p-8 hover:-translate-y-1 transition-all duration-300 group">
-              <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Cpu className="text-blue-600" size={32} />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-4">{t.customization.hardware}</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">{t.customization.hardwareDesc}</p>
-            </div>
-            <div className="bg-white/80 backdrop-blur-md border border-white shadow-xl shadow-slate-200/50 rounded-2xl p-8 hover:-translate-y-1 transition-all duration-300 group">
-              <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Monitor className="text-emerald-600" size={32} />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-4">{t.customization.software}</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">{t.customization.softwareDesc}</p>
-            </div>
-            <div className="bg-white/80 backdrop-blur-md border border-white shadow-xl shadow-slate-200/50 rounded-2xl p-8 hover:-translate-y-1 transition-all duration-300 group">
-              <div className="w-14 h-14 bg-violet-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Server className="text-violet-600" size={32} />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-4">{t.customization.protocol}</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">{t.customization.protocolDesc}</p>
-            </div>
-            <div className="bg-white/80 backdrop-blur-md border border-white shadow-xl shadow-slate-200/50 rounded-2xl p-8 hover:-translate-y-1 transition-all duration-300 group">
-              <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <ShieldCheck className="text-amber-600" size={32} />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-4">{t.customization.system}</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">{t.customization.systemDesc}</p>
-            </div>
+            {(features && features.length > 0) ? (
+              features.map((f, i) => {
+                const IconComponent = i === 0 ? Cpu : i === 1 ? Monitor : i === 2 ? Server : ShieldCheck;
+                const colors = i === 0 ? 'blue' : i === 1 ? 'emerald' : i === 2 ? 'violet' : 'amber';
+                return (
+                  <div key={i} className="bg-white/80 backdrop-blur-md border border-white shadow-xl shadow-slate-200/50 rounded-2xl p-8 hover:-translate-y-1 transition-all duration-300 group">
+                    <div className={`w-14 h-14 bg-${colors}-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                      <IconComponent className={`text-${colors}-600`} size={32} />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-4">{lang === 'zh' ? f.title : (f.titleEn || f.title)}</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed">{lang === 'zh' ? f.desc : (f.descEn || f.desc)}</p>
+                  </div>
+                );
+              })
+            ) : (
+              <>
+                <div className="bg-white/80 backdrop-blur-md border border-white shadow-xl shadow-slate-200/50 rounded-2xl p-8 hover:-translate-y-1 transition-all duration-300 group">
+                  <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <Cpu className="text-blue-600" size={32} />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-4">{t.customization.hardware}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{t.customization.hardwareDesc}</p>
+                </div>
+                <div className="bg-white/80 backdrop-blur-md border border-white shadow-xl shadow-slate-200/50 rounded-2xl p-8 hover:-translate-y-1 transition-all duration-300 group">
+                  <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <Monitor className="text-emerald-600" size={32} />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-4">{t.customization.software}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{t.customization.softwareDesc}</p>
+                </div>
+                <div className="bg-white/80 backdrop-blur-md border border-white shadow-xl shadow-slate-200/50 rounded-2xl p-8 hover:-translate-y-1 transition-all duration-300 group">
+                  <div className="w-14 h-14 bg-violet-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <Server className="text-violet-600" size={32} />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-4">{t.customization.protocol}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{t.customization.protocolDesc}</p>
+                </div>
+                <div className="bg-white/80 backdrop-blur-md border border-white shadow-xl shadow-slate-200/50 rounded-2xl p-8 hover:-translate-y-1 transition-all duration-300 group">
+                  <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <ShieldCheck className="text-amber-600" size={32} />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-4">{t.customization.system}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{t.customization.systemDesc}</p>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="flex justify-center">
@@ -426,11 +434,12 @@ export default function HomeClient({ initialData }: HomeClientProps) {
                 onClick={() => setSelectedImage(item.image)}
               >
                 <div className="relative h-56 overflow-hidden">
-                  <img
+                  <Image
                     src={item.image}
                     alt={lang === 'en' && item.titleEn ? item.titleEn : item.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -453,14 +462,26 @@ export default function HomeClient({ initialData }: HomeClientProps) {
         </div>
       </section>
 
+      {/* Contact Section */}
+      <section id="contact" className="bg-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">{t.hero.contact}</h2>
+            <p className="text-slate-600">{t.footer.contactSub}</p>
+          </div>
+        </div>
+      </section>
+
       {/* About Section */}
       <section id="about" className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="relative">
-              <img
+              <Image
                 src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=1000"
                 alt="Modern Factory"
+                width={800}
+                height={500}
                 className="rounded-3xl shadow-lg w-full h-[500px] object-cover"
               />
               <div className="absolute -bottom-6 -right-6 lg:-right-10 bg-white p-8 rounded-3xl shadow-[0_20px_50px_rgb(0,0,0,0.1)] border border-slate-100">
@@ -471,9 +492,9 @@ export default function HomeClient({ initialData }: HomeClientProps) {
 
             <div className="space-y-10 lg:pl-8 mt-12 lg:mt-0">
               <div>
-                <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-6">{t.about.title}</h2>
+                <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-6">{about?.title || t.about.title}</h2>
                 <p className="text-slate-600 leading-relaxed text-lg">
-                  {lang === 'zh' ? about?.description : about?.descriptionEn}
+                  {lang === 'zh' ? (about?.description || t.about.intro) : (about?.descriptionEn || t.about.intro)}
                 </p>
               </div>
 
@@ -503,14 +524,18 @@ export default function HomeClient({ initialData }: HomeClientProps) {
         </div>
       </section>
 
-      {/* Footer */}
-      <Footer lang={lang} contact={contact} consult={consult} />
-
       {/* Modals */}
       {selectedImage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm" onClick={() => setSelectedImage(null)}>
           <button className="absolute top-6 right-6 text-white/70 hover:text-white bg-white/10 p-2 rounded-full"><X size={24} /></button>
-          <img src={selectedImage} alt="View" className="max-w-full max-h-full object-contain rounded-lg" />
+          <div className="relative w-full h-full max-w-[90vw] max-h-[90vh]">
+            <Image 
+              src={selectedImage} 
+              alt="View" 
+              fill
+              className="object-contain rounded-lg" 
+            />
+          </div>
         </div>
       )}
 
@@ -521,29 +546,6 @@ export default function HomeClient({ initialData }: HomeClientProps) {
         </div>
       )}
 
-      {selected360Product && (
-        <Product360Viewer
-          productCode={selected360Product.code || selected360Product.id}
-          image={selected360Product.image}
-          images360Count={selected360Product.images360Count}
-          title={lang === 'en' && selected360Product.nameEn ? selected360Product.nameEn : selected360Product.name}
-          onClose={() => setSelected360Product(null)}
-        />
-      )}
-
-      {selectedProductDetail && (
-        <ProductDetailModal
-          product={selectedProductDetail}
-          categories={categories}
-          lang={lang}
-          onClose={() => setSelectedProductDetail(null)}
-          onOpen360={(product) => {
-            setSelectedProductDetail(null);
-            setSelected360Product(product);
-          }}
-          onDownload={() => { }}
-        />
-      )}
     </div>
   );
 }

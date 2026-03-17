@@ -46,23 +46,14 @@ model Product {
   has360         Boolean?          @default(false)
   images360Count Int?              @default(0)
   manualUrl      String?
+  specs          Json?             // Native Json support in Prisma 6+ for SQLite
   introImages    ProductImage[]
-  specs          ProductSpec[]
   documents      ProductDocument[]
 }
 
 model ProductImage {
   id        String  @id @default(cuid())
   url       String
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-}
-
-model ProductSpec {
-  id        String  @id @default(cuid())
-  label     String
-  labelEn   String
-  value     String
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
@@ -98,35 +89,12 @@ model VideoItem {
   videoUrl  String
 }
 
-model Contact {
-  id      Int     @id @default(1)
-  phone   String?
-  mobile  String?
-  email   String?
-  address String?
-}
-
-model Consult {
-  id          Int     @id @default(1)
-  title       String?
-  description String?
-  wechatEnabled Boolean? @default(false)
-  wechatLabel   String?
-  wechatQrImage String?
-  qqEnabled     Boolean? @default(false)
-  qqNumber      String?
-  qqLabel       String?
-  qqQrImage     String?
-}
-
-model About {
-  id            Int     @id @default(1)
-  description   String?
-  descriptionEn String?
-}
-
-model Hero {
-  id       Int     @id @default(1)
-  videoUrl String
-  poster   String?
+model SiteConfig {
+  id       Int      @id @default(1)
+  hero     Json?    // { badge, title1, title2, title3, subtitle, videoUrl, poster }
+  features Json?    // [ { icon, title, desc, titleEn, descEn } ]
+  about    Json?    // { description, intro, factoryLabel, features: [] }
+  contact  Json?    // { phone, mobile, email, address }
+  consult  Json?    // { title, description, wechat: {}, qq: {} }
+  sections Json?    // { products: {}, solutions: {}, customization: {}, album: {} }
 }

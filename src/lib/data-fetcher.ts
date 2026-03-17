@@ -36,7 +36,6 @@ export const getProducts = unstable_cache(
   async () => {
     const data = await prisma.product.findMany({
       include: {
-        specs: true,
         documents: true,
         introImages: true,
       },
@@ -44,6 +43,7 @@ export const getProducts = unstable_cache(
     return data.map(p => ({
       ...p,
       introImages: p.introImages.map(img => img.url),
+      specs: typeof p.specs === 'string' ? JSON.parse(p.specs) : p.specs,
     }));
   },
   ['products'],
@@ -55,7 +55,6 @@ export const getProductById = unstable_cache(
     const p = await prisma.product.findUnique({
       where: { id },
       include: {
-        specs: true,
         documents: true,
         introImages: true,
       },
@@ -64,64 +63,50 @@ export const getProductById = unstable_cache(
     return {
       ...p,
       introImages: p.introImages.map(img => img.url),
+      specs: typeof p.specs === 'string' ? JSON.parse(p.specs) : p.specs,
     };
   },
   ['product-detail'],
   { revalidate: 3600 }
 );
 
-export const getRecommendations = async (categoryId: string, excludeId: string) => {
-  const data = await prisma.product.findMany({
-    where: {
-      category: categoryId,
-      id: { not: excludeId },
-    },
-    take: 4,
-  });
-  return data;
-};
-
-export const getContact = unstable_cache(
-  async () => await prisma.contact.findUnique({ where: { id: 1 } }),
-  ['contact'],
-  { revalidate: 3600 }
-);
-
-export const getConsult = unstable_cache(
+export const getSiteConfig = unstable_cache(
   async () => {
-    const data = await prisma.consult.findUnique({ where: { id: 1 } });
-    if (!data) return null;
+    const config = await prisma.siteConfig.findUnique({ where: { id: 1 } });
+    if (!config) return null;
+    
+    // Parse JSON fields if they are returned as strings (Prisma sometimes does this for SQLite Json)
+    const parse = (val: any) => typeof val === 'string' ? JSON.parse(val) : val;
+    
     return {
-      title: data.title,
-      description: data.description,
-      wechat: {
-        enabled: data.wechatEnabled,
-        label: data.wechatLabel,
-        qrImage: data.wechatQrImage,
-      },
-      qq: {
-        enabled: data.qqEnabled,
-        number: data.qqNumber,
-        label: data.qqLabel,
-        qrImage: data.qqQrImage,
-      },
+      hero: parse(config.hero),
+      features: parse(config.features),
+      about: parse(config.about),
+      contact: parse(config.contact),
+      consult: parse(config.consult),
+      sections: parse(config.sections),
     };
   },
-  ['consult'],
+  ['site-config'],
   { revalidate: 3600 }
 );
 
-export const getAbout = unstable_cache(
-  async () => await prisma.about.findUnique({ where: { id: 1 } }),
-  ['about'],
-  { revalidate: 3600 }
-);
+export const getContact = async () => {
+  const config = await getSiteConfig();
+  return config?.contact || null;
+};
 
-export const getHero = unstable_cache(
-  async () => await prisma.hero.findUnique({ where: { id: 1 } }),
-  ['hero'],
-  { revalidate: 3600 }
-);
+export const getConsult = async () => {
+  const config = await getSiteConfig();
+  return config?.consult || null;
+};
+
+export const getRecommendations = async (productId: string, limit = 4) => {
+  const allProducts = await getProducts();
+  return allProducts
+    .filter(p => p.id !== productId)
+    .slice(0, limit);
+};
 
 export const getAllPageData = async () => {
   const [
@@ -131,10 +116,7 @@ export const getAllPageData = async () => {
     solutionVideos,
     companyAlbum,
     products,
-    contact,
-    consult,
-    about,
-    hero
+    siteConfig
   ] = await Promise.all([
     getCategories(),
     getAlbumCategories(),
@@ -142,10 +124,7 @@ export const getAllPageData = async () => {
     getSolutionVideos(),
     getCompanyAlbum(),
     getProducts(),
-    getContact(),
-    getConsult(),
-    getAbout(),
-    getHero()
+    getSiteConfig()
   ]);
 
   return {
@@ -155,9 +134,6 @@ export const getAllPageData = async () => {
     solutionVideos,
     companyAlbum,
     products,
-    contact,
-    consult,
-    about,
-    hero
+    ...siteConfig
   };
 };

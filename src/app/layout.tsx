@@ -1,32 +1,38 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
-import ClientLayout from "../components/ClientLayout";
-import { LanguageProvider } from "../components/LanguageContext";
-import { getContact, getConsult } from "../lib/data-fetcher";
+
+const alibabaPuHuiTi = localFont({
+  src: [
+    {
+      path: "../../public/fonts/AlibabaPuHuiTi-2-55-Regular.woff",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/AlibabaPuHuiTi-3-45-Light.woff",
+      weight: "300",
+      style: "normal",
+    },
+  ],
+  variable: "--font-alibaba",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "唯英科技",
   description: "唯英科技产品展示",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [contact, consult] = await Promise.all([
-    getContact(),
-    getConsult()
-  ]);
-
   return (
-    <html lang="zh">
-      <body>
-        <LanguageProvider>
-          <ClientLayout contact={contact} consult={consult}>
-            {children}
-          </ClientLayout>
-        </LanguageProvider>
+    <html lang="zh" suppressHydrationWarning>
+      <body className={`${alibabaPuHuiTi.variable} antialiased`}>
+        {children}
       </body>
     </html>
   );

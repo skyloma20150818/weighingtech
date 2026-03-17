@@ -16,15 +16,6 @@ interface ClientLayoutProps {
 
 export default function ClientLayout({ children, contact, consult }: ClientLayoutProps) {
   const { lang, setLang } = useLanguage();
-  const pathname = usePathname();
-  const isHomePage = pathname === '/';
-
-  // 首页和开发工具页面不显示公共 Header/Footer
-  const isDevEditor = pathname === '/dev-editor';
-  if (isHomePage || isDevEditor) {
-    return <>{children}</>;
-  }
-
   return (
     <>
       <Header lang={lang} onLangChange={setLang} phone={contact?.phone} />

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Contact, Consult } from '../data';
 import { Language, translations } from '../i18n';
 
@@ -21,10 +22,12 @@ export default function Footer({ lang, contact, consult }: FooterProps) {
           {/* Brand & Info */}
           <div className="lg:col-span-4 space-y-6">
             <div className="flex items-center">
-              <img
+              <Image
                 src="/logo.png"
                 alt="唯英科技 Logo"
-                className="h-12 object-contain brightness-0 invert opacity-90"
+                width={160}
+                height={48}
+                className="h-12 w-auto object-contain brightness-0 invert opacity-90"
               />
             </div>
             <p className="text-sm text-slate-400 leading-relaxed">
@@ -71,7 +74,13 @@ export default function Footer({ lang, contact, consult }: FooterProps) {
                 {consult?.wechat?.enabled && consult?.wechat?.qrImage && (
                   <div className="text-center">
                     <div className="w-28 h-28 bg-white rounded-2xl p-2 mb-3 shadow-lg">
-                      <img src={consult.wechat.qrImage} alt="微信咨询" className="w-full h-full object-contain" />
+                      <Image 
+                        src={consult.wechat.qrImage} 
+                        alt="微信咨询" 
+                        width={112}
+                        height={112}
+                        className="w-full h-full object-contain" 
+                      />
                     </div>
                     <span className="text-sm font-medium text-slate-300">{consult.wechat?.label || t.footer.wechat}</span>
                   </div>
@@ -79,7 +88,13 @@ export default function Footer({ lang, contact, consult }: FooterProps) {
                 {consult?.qq?.enabled && consult?.qq?.qrImage && (
                   <div className="text-center">
                     <div className="w-28 h-28 bg-white rounded-2xl p-2 mb-3 shadow-lg">
-                      <img src={consult.qq.qrImage} alt="QQ咨询" className="w-full h-full object-contain" />
+                      <Image 
+                        src={consult.qq.qrImage} 
+                        alt="QQ咨询" 
+                        width={112}
+                        height={112}
+                        className="w-full h-full object-contain" 
+                      />
                     </div>
                     <span className="text-sm font-medium text-slate-300">{consult.qq?.label || t.footer.qq}</span>
                   </div>
@@ -99,7 +114,13 @@ export default function Footer({ lang, contact, consult }: FooterProps) {
               ICP:渝ICP备14003796号-1
             </a>
             <a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=50010902001488" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-white transition-colors">
-              <img src="https://beian.mps.gov.cn/img/logo01.dd7ff50e.png" alt="公安备案图标" className="w-4 h-4" />
+              <Image 
+                src="https://beian.mps.gov.cn/img/logo01.dd7ff50e.png" 
+                alt="公安备案图标" 
+                width={16}
+                height={16}
+                className="w-4 h-4" 
+              />
               渝公网安备 50010902001488号
             </a>
           </div>

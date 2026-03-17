@@ -37,6 +37,7 @@ export interface Product {
   introImages?: string[];
   specs?: ProductSpec[];
   documents?: ProductDocument[];
+  manualUrl?: string;
 }
 
 export interface AlbumItem {
@@ -80,13 +81,58 @@ export interface Consult {
 }
 
 export interface About {
+  title?: string;
+  titleEn?: string;
+  subtitle?: string;
+  subtitleEn?: string;
   description?: string;
   descriptionEn?: string;
+  image?: string;
 }
 
 export interface Hero {
-  videoUrl: string;
+  badge?: string;
+  badgeEn?: string;
+  title1?: string;
+  title1En?: string;
+  title2?: string;
+  title2En?: string;
+  title3?: string;
+  title3En?: string;
+  subtitle?: string;
+  subtitleEn?: string;
+  productsLabel?: string;
+  productsLabelEn?: string;
+  contactLabel?: string;
+  contactLabelEn?: string;
+  videoUrl?: string;
   poster?: string;
+}
+
+export interface Feature {
+  icon: string;
+  title: string;
+  titleEn?: string;
+  desc: string;
+  descEn?: string;
+}
+
+export interface SiteConfig {
+  hero: Hero;
+  features: Feature[];
+  about: About;
+  contact: Contact;
+  consult: Consult;
+  sections?: {
+    [key: string]: {
+      title?: string;
+      titleEn?: string;
+      subtitle?: string;
+      subtitleEn?: string;
+      badge?: string;
+      badgeEn?: string;
+    }
+  };
 }
 
 export const categories = data.categories as Category[];

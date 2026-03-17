@@ -84,6 +84,22 @@ export default function ProductDetailModal({ product, categories, lang, onClose,
                 </p>
               </div>
 
+              {product.specs && product.specs.length > 0 && (
+                <div className="space-y-3 mb-8">
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+                    {lang === 'en' ? 'Specifications' : '规格参数'}
+                  </h4>
+                  <div className="grid grid-cols-1 gap-2">
+                    {product.specs.map((spec, index) => (
+                      <div key={index} className="flex justify-between items-center py-2 border-b border-slate-50 text-sm">
+                        <span className="text-slate-500">{lang === 'en' ? spec.labelEn : spec.label}</span>
+                        <span className="font-semibold text-slate-800">{spec.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="mt-auto pt-6 border-t border-slate-100">
                 <a 
                   href={product.manualUrl || '#'} 

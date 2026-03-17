@@ -1,5 +1,5 @@
-import { getAllPageData } from '../lib/data-fetcher';
-import HomeClient from '../components/HomeClient';
+import { getAllPageData } from '../../lib/data-fetcher';
+import HomeClient from '../../components/HomeClient';
 
 export default async function Page() {
   const initialData = await getAllPageData();

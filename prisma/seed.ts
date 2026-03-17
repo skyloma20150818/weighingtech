@@ -101,7 +101,7 @@ async function main() {
       });
 
       // 迁移 Specs
-      if (specs && specs.length > 0) {
+      if (specs && Array.isArray(specs) && specs.length > 0) {
         // 先删除旧的
         await prisma.productSpec.deleteMany({ where: { productId: p.id } });
         for (const spec of specs) {
@@ -115,7 +115,7 @@ async function main() {
       }
 
       // 迁移 Documents
-      if (documents && documents.length > 0) {
+      if (documents && Array.isArray(documents) && documents.length > 0) {
         // 先删除旧的
         await prisma.productDocument.deleteMany({ where: { productId: p.id } });
         for (const doc of documents) {

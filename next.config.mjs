@@ -11,6 +11,12 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // 增大 body 限制到 50MB
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '50mb',
+    },
+  },
 };
 
 export default nextConfig;

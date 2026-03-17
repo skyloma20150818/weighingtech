@@ -8,9 +8,9 @@ export const dynamic = 'force-dynamic';
 
 import {
   Save, Upload, Plus, Trash2, Edit2, ChevronRight,
-  Settings, Package, FolderOpen, Video, Image as ImageIcon,
+  Settings, Package, FolderOpen, Image as ImageIcon,
   Phone, Globe, AlertCircle, CheckCircle2, X, Download,
-  RotateCcw, FileText, Monitor
+  RotateCcw, FileText, Monitor, Users, LayoutGrid
 } from 'lucide-react';
 import Editor from 'react-simple-wysiwyg';
 
@@ -67,8 +67,10 @@ export default function DevEditor() {
     fd.append('file', file);
     fd.append('category', category);
     try {
-      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+      const res = await fetch('/api/upload-direct', { method: 'POST', body: fd });
       if (res.ok) return (await res.json()).url;
+      const err = await res.json();
+      console.error('Upload error:', err.error);
     } catch (e) { console.error(e); }
     return null;
   };
@@ -95,8 +97,7 @@ export default function DevEditor() {
     { id: 'categories', label: '分类管理', icon: FolderOpen },
     { id: 'album', label: '企业相册', icon: ImageIcon },
     { id: 'videos', label: '解决方案', icon: Video },
-    { id: 'hero', label: '首页首屏', icon: Monitor },
-    { id: 'contact', label: '联系/咨询', icon: Phone },
+    { id: 'siteconfig', label: '网站配置', icon: LayoutGrid },
   ];
 
   return (
@@ -225,14 +226,9 @@ export default function DevEditor() {
             <VideoEditor data={data} handleSave={handleSave} handleFileUpload={handleFileUpload} />
           )}
 
-          {/* ——— 联系/咨询 ——— */}
-          {activeTab === 'contact' && (
-            <ContactEditor data={data} handleSave={handleSave} handleFileUpload={handleFileUpload} />
-          )}
-
-          {/* ——— 首页首屏 ——— */}
-          {activeTab === 'hero' && (
-            <HeroEditor data={data} handleSave={handleSave} handleFileUpload={handleFileUpload} />
+          {/* ——— 网站配置 ——— */}
+          {activeTab === 'siteconfig' && (
+            <SiteConfigEditor data={data} handleSave={handleSave} handleFileUpload={handleFileUpload} />
           )}
 
         </div>
@@ -964,6 +960,576 @@ function Video({ size, className }: { size: number; className?: string }) {
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className}>
       <polygon points="23 7 16 12 23 17 23 7" />
       <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+    </svg>
+  );
+}
+
+/* ==================== 网站配置编辑器 ==================== */
+function SiteConfigEditor({ data, handleSave, handleFileUpload }: any) {
+  const [activeSubTab, setActiveSubTab] = useState('hero');
+
+  // 获取配置数据，支持向后兼容
+  const getConfig = () => {
+    const siteConfig = data.siteConfig || {};
+    return {
+      hero: siteConfig.hero || data.hero || {},
+      features: siteConfig.features || [],
+      about: siteConfig.about || {},
+      contact: siteConfig.contact || data.contact || {},
+      consult: siteConfig.consult || data.consult || { wechat: { enabled: false, qrImage: '' }, qq: { enabled: false, qrImage: '' } },
+      sections: siteConfig.sections || {}
+    };
+  };
+
+  const config = getConfig();
+
+  const updateConfig = (key: string, value: any) => {
+    const nd = { ...data };
+    if (!nd.siteConfig) nd.siteConfig = {};
+    nd.siteConfig[key] = value;
+    // 保持向后兼容
+    if (key === 'hero') nd.hero = value;
+    if (key === 'contact') nd.contact = value;
+    if (key === 'consult') nd.consult = value;
+    handleSave(nd);
+  };
+
+  const subTabs = [
+    { id: 'hero', label: '首页首屏', icon: Monitor },
+    { id: 'features', label: '特色功能', icon: Star },
+    { id: 'about', label: '关于我们', icon: Users },
+    { id: 'contact', label: '联系方式', icon: Phone },
+    { id: 'sections', label: '区块标题', icon: LayoutGrid },
+  ];
+
+  return (
+    <div>
+      {/* 子选项卡 */}
+      <div className="flex gap-1 mb-6 border-b border-slate-200">
+        {subTabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveSubTab(tab.id)}
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px ${
+              activeSubTab === tab.id
+                ? 'border-[#2B4A7A] text-[#2B4A7A]'
+                : 'border-transparent text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            <tab.icon size={14} />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* 子选项卡内容 */}
+      {activeSubTab === 'hero' && (
+        <HeroSectionEditor config={config.hero} updateConfig={updateConfig} handleFileUpload={handleFileUpload} />
+      )}
+      {activeSubTab === 'features' && (
+        <FeaturesSectionEditor config={config.features} updateConfig={updateConfig} />
+      )}
+      {activeSubTab === 'about' && (
+        <AboutSectionEditor config={config.about} updateConfig={updateConfig} handleFileUpload={handleFileUpload} />
+      )}
+      {activeSubTab === 'contact' && (
+        <ContactSectionEditor config={config.contact} consult={config.consult} updateConfig={updateConfig} handleFileUpload={handleFileUpload} />
+      )}
+      {activeSubTab === 'sections' && (
+        <SectionsSectionEditor config={config.sections} updateConfig={updateConfig} data={data} />
+      )}
+    </div>
+  );
+}
+
+/* ==================== 首页首屏编辑器 ==================== */
+function HeroSectionEditor({ config, updateConfig, handleFileUpload }: any) {
+  const [extracting, setExtracting] = useState(false);
+  const hero = config || {};
+
+  return (
+    <div className="space-y-6">
+      <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+        <Monitor size={15} className="text-blue-500" />首页首屏多媒体
+      </h3>
+      <div className="bg-slate-50 p-6 rounded-xl border space-y-6">
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">背景视频 (MP4)</label>
+          <div className="flex gap-3 items-center">
+            <input
+              className="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+              value={hero.videoUrl || ''}
+              onChange={e => updateConfig('hero', { ...hero, videoUrl: e.target.value })}
+              placeholder="例如: /uploads/videos/hero-video.mp4 或是外部链接"
+            />
+            <button
+              type="button"
+              onClick={() => document.getElementById('hero-video-upload')?.click()}
+              disabled={extracting}
+              className={`bg-white border border-slate-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 flex items-center gap-2 transition-colors ${extracting ? 'opacity-70 cursor-not-allowed' : ''}`}
+            >
+              {extracting ? <RotateCcw size={16} className="text-blue-500 animate-spin" /> : <Upload size={16} className="text-slate-500" />}
+              {extracting ? '上传及处理中...' : '上传视频'}
+            </button>
+            <input
+              id="hero-video-upload"
+              type="file"
+              className="hidden"
+              accept="video/*"
+              disabled={extracting}
+              onChange={async e => {
+                const f = e.target.files?.[0];
+                console.log('Selected file:', f?.name, 'size:', f?.size);
+                if (f) {
+                  setExtracting(true);
+                  try {
+                    console.log('Uploading video...');
+                    const url = await handleFileUpload(f, 'videos');
+                    console.log('Upload result:', url);
+                    if (!url) {
+                      alert('视频上传失败，请检查网络连接');
+                      setExtracting(false);
+                      return;
+                    }
+                    const updatedHero = { ...hero, videoUrl: url };
+
+                    console.log('Extracting video frame...');
+                    const frameFile = await new Promise<File | null>((resolve) => {
+                      const video = document.createElement('video');
+                      const objUrl = URL.createObjectURL(f);
+                      video.src = objUrl;
+                      video.muted = true;
+                      video.playsInline = true;
+                      video.onloadeddata = () => {
+                        console.log('Video loaded, duration:', video.duration);
+                        video.currentTime = Math.min(0.5, video.duration / 2 || 0.5);
+                      };
+                      video.onseeked = () => {
+                        console.log('Seeked to:', video.currentTime, 'width:', video.videoWidth, 'height:', video.videoHeight);
+                        const canvas = document.createElement('canvas');
+                        canvas.width = video.videoWidth || 1920;
+                        canvas.height = video.videoHeight || 1080;
+                        const ctx = canvas.getContext('2d');
+                        ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        canvas.toBlob((blob) => {
+                          if (blob) resolve(new File([blob], f.name.replace(/\.[^/.]+$/, "") + "_poster.jpg", { type: 'image/jpeg' }));
+                          else resolve(null);
+                          URL.revokeObjectURL(objUrl);
+                        }, 'image/jpeg', 0.8);
+                      };
+                      video.onerror = () => { URL.revokeObjectURL(objUrl); resolve(null); };
+                    });
+
+                    if (frameFile) {
+                      console.log('Uploading poster...');
+                      const posterUrl = await handleFileUpload(frameFile, 'hero');
+                      console.log('Poster upload result:', posterUrl);
+                      if (posterUrl) updatedHero.poster = posterUrl;
+                    }
+                    updateConfig('hero', updatedHero);
+                  } catch (err) { console.error("上传或截图失败", err); alert('处理失败: ' + err); }
+                  finally { setExtracting(false); }
+                }
+              }}
+            />
+          </div>
+          <p className="text-xs text-slate-500 mt-2">推荐尺寸 1920x1080，大小不要超过 20MB。上传后将自动提取第0.5秒作为海报封面。</p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">封面图片 (海报/备用图)</label>
+          <div className="flex gap-4">
+            <div className="w-48 h-28 bg-white border border-slate-200 rounded-lg overflow-hidden relative group">
+              {hero.poster ? (
+                <img src={hero.poster} className="w-full h-full object-cover" alt="Hero Poster" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-100">无图片</div>
+              )}
+              <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white cursor-pointer">
+                <Upload size={20} className="mb-1" />
+                <span className="text-[10px]">上传图片</span>
+                <input type="file" className="hidden" accept="image/*" onChange={async e => {
+                  const f = e.target.files?.[0];
+                  if (f) {
+                    const url = await handleFileUpload(f, 'hero');
+                    if (url) updateConfig('hero', { ...hero, poster: url });
+                  }
+                }} />
+              </label>
+            </div>
+            <div className="flex-1 flex flex-col justify-center space-y-2">
+              <input
+                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+                value={hero.poster || ''}
+                onChange={e => updateConfig('hero', { ...hero, poster: e.target.value })}
+                placeholder="图片链接"
+              />
+              <p className="text-xs text-slate-500">此图片用作视频加载前的海报图。上传视频时已自动生成，你也可以单独上传覆盖该图。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ==================== 特色功能编辑器 ==================== */
+function FeaturesSectionEditor({ config, updateConfig }: any) {
+  const features = config || [];
+
+  const addFeature = () => {
+    const newFeatures = [...features, { icon: 'Star', title: '新特性', titleEn: 'New Feature', desc: '描述内容', descEn: 'Description' }];
+    updateConfig('features', newFeatures);
+  };
+
+  const updateFeature = (index: number, field: string, value: string) => {
+    const newFeatures = [...features];
+    newFeatures[index] = { ...newFeatures[index], [field]: value };
+    updateConfig('features', newFeatures);
+  };
+
+  const removeFeature = (index: number) => {
+    if (confirm('确定删除此特性?')) {
+      const newFeatures = features.filter((_: any, i: number) => i !== index);
+      updateConfig('features', newFeatures);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+          <Star size={15} className="text-yellow-500" />特色功能列表
+        </h3>
+        <button onClick={addFeature} className="bg-[#2B4A7A] text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5">
+          <Plus size={15} /> 添加特性
+        </button>
+      </div>
+
+      {features.length === 0 ? (
+        <div className="text-center py-12 text-slate-400 bg-slate-50 rounded-xl">
+          暂无特性配置，点击"添加特性"开始配置
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {features.map((feature: any, i: number) => (
+            <div key={i} className="bg-slate-50 p-4 rounded-xl border relative group">
+              <button
+                onClick={() => removeFeature(i)}
+                className="absolute top-3 right-3 p-1.5 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <Trash2 size={14} />
+              </button>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">图标名称</label>
+                  <input
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+                    value={feature.icon || ''}
+                    onChange={e => updateFeature(i, 'icon', e.target.value)}
+                    placeholder="如: Star, Zap, Shield"
+                  />
+                </div>
+                <div></div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">中文标题</label>
+                  <input
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+                    value={feature.title || ''}
+                    onChange={e => updateFeature(i, 'title', e.target.value)}
+                    placeholder="特性标题"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">English Title</label>
+                  <input
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+                    value={feature.titleEn || ''}
+                    onChange={e => updateFeature(i, 'titleEn', e.target.value)}
+                    placeholder="Feature Title"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-xs text-slate-400 mb-1">中文描述</label>
+                  <textarea
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+                    rows={2}
+                    value={feature.desc || ''}
+                    onChange={e => updateFeature(i, 'desc', e.target.value)}
+                    placeholder="特性描述内容"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-xs text-slate-400 mb-1">Description (EN)</label>
+                  <textarea
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+                    rows={2}
+                    value={feature.descEn || ''}
+                    onChange={e => updateFeature(i, 'descEn', e.target.value)}
+                    placeholder="Feature description"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ==================== 关于我们编辑器 ==================== */
+function AboutSectionEditor({ config, updateConfig, handleFileUpload }: any) {
+  const about = config || {};
+
+  const updateAbout = (field: string, value: any) => {
+    updateConfig('about', { ...about, [field]: value });
+  };
+
+  return (
+    <div className="space-y-6">
+      <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+        <Users size={15} className="text-green-500" />关于我们
+      </h3>
+      <div className="bg-slate-50 p-6 rounded-xl border space-y-6">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">标题 (中文)</label>
+            <input
+              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+              value={about.title || ''}
+              onChange={e => updateAbout('title', e.target.value)}
+              placeholder="关于标题"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Title (English)</label>
+            <input
+              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+              value={about.titleEn || ''}
+              onChange={e => updateAbout('titleEn', e.target.value)}
+              placeholder="About Title"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">简介描述 (中文)</label>
+          <textarea
+            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+            rows={4}
+            value={about.description || ''}
+            onChange={e => updateAbout('description', e.target.value)}
+            placeholder="公司简介描述内容..."
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">Description (EN)</label>
+          <textarea
+            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+            rows={4}
+            value={about.descriptionEn || ''}
+            onChange={e => updateAbout('descriptionEn', e.target.value)}
+            placeholder="Company introduction..."
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">展示图片</label>
+          <div className="flex gap-4">
+            <div className="w-48 h-32 bg-white border border-slate-200 rounded-lg overflow-hidden relative group">
+              {about.image ? (
+                <img src={about.image} className="w-full h-full object-cover" alt="About" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-100">无图片</div>
+              )}
+              <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white cursor-pointer">
+                <Upload size={20} className="mb-1" />
+                <span className="text-[10px]">上传图片</span>
+                <input type="file" className="hidden" accept="image/*" onChange={async e => {
+                  const f = e.target.files?.[0];
+                  if (f) {
+                    const url = await handleFileUpload(f, 'about');
+                    if (url) updateAbout('image', url);
+                  }
+                }} />
+              </label>
+            </div>
+            <div className="flex-1">
+              <input
+                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+                value={about.image || ''}
+                onChange={e => updateAbout('image', e.target.value)}
+                placeholder="图片链接"
+              />
+              <p className="text-xs text-slate-500 mt-2">建议尺寸 800x600px 或 16:9 比例</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ==================== 联系方式编辑器 ==================== */
+function ContactSectionEditor({ config, consult, updateConfig, handleFileUpload }: any) {
+  const contact = config || {};
+  const consultData = consult || { wechat: { enabled: false, qrImage: '' }, qq: { enabled: false, qrImage: '' } };
+
+  const updateContact = (field: string, value: string) => {
+    updateConfig('contact', { ...contact, [field]: value });
+  };
+
+  const updateConsult = (field: string, value: any) => {
+    updateConfig('consult', { ...consultData, [field]: value });
+  };
+
+  const updateConsultItem = (type: string, field: string, value: any) => {
+    updateConfig('consult', { ...consultData, [type]: { ...consultData[type], [field]: value } });
+  };
+
+  return (
+    <div className="grid md:grid-cols-2 gap-10">
+      <div>
+        <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
+          <Phone size={15} className="text-blue-500" />基础联系方式
+        </h3>
+        <div className="space-y-3">
+          {[
+            { key: 'phone', label: '固话' },
+            { key: 'mobile', label: '手机' },
+            { key: 'email', label: '邮箱' },
+            { key: 'address', label: '地址' },
+            { key: 'addressEn', label: 'Address (EN)' },
+          ].map(({ key, label }) => (
+            <div key={key}>
+              <label className="block text-xs text-slate-400 mb-1">{label}</label>
+              <input
+                className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none"
+                value={contact[key] || ''}
+                onChange={e => updateContact(key, e.target.value)}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div>
+        <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
+          <Globe size={15} className="text-emerald-500" />在线咨询 (扫码)
+        </h3>
+        <div className="space-y-4 p-4 bg-slate-50 rounded-xl border">
+          <div>
+            <label className="block text-xs text-slate-400 mb-1">标题</label>
+            <input className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none" value={consultData.title || ''} onChange={e => updateConsult('title', e.target.value)} />
+          </div>
+          <div>
+            <label className="block text-xs text-slate-400 mb-1">描述</label>
+            <textarea className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none" rows={2} value={consultData.description || ''} onChange={e => updateConsult('description', e.target.value)} />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            {['wechat', 'qq'].map(type => (
+              <div key={type} className="bg-white p-3 rounded-lg border">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold uppercase text-slate-600">{type}</span>
+                  <input type="checkbox" checked={consultData[type]?.enabled ?? false} onChange={e => updateConsultItem(type, 'enabled', e.target.checked)} />
+                </div>
+                <div className="aspect-square bg-slate-50 rounded-lg relative overflow-hidden">
+                  {consultData[type]?.qrImage ? <img src={consultData[type].qrImage} className="w-full h-full object-contain" alt="" /> : <div className="w-full h-full flex items-center justify-center text-slate-300 text-xs">暂无二维码</div>}
+                  <label className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity">
+                    <Upload className="text-white" size={18} />
+                    <input type="file" className="hidden" accept="image/*" onChange={async e => {
+                      const f = e.target.files?.[0];
+                      if (f) {
+                        const url = await handleFileUpload(f, 'others');
+                        if (url) updateConsultItem(type, 'qrImage', url);
+                      }
+                    }} />
+                  </label>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ==================== 区块标题编辑器 ==================== */
+function SectionsSectionEditor({ config, updateConfig, data }: any) {
+  const sections = config || {};
+
+  const sectionFields = [
+    { key: 'products', label: '产品中心', labelEn: 'Products', dataKey: 'products' },
+    { key: 'solutions', label: '解决方案', labelEn: 'Solutions', dataKey: 'solutionVideos' },
+    { key: 'customization', label: '定制服务', labelEn: 'Customization', dataKey: 'products' },
+    { key: 'album', label: '企业相册', labelEn: 'Album', dataKey: 'companyAlbum' },
+  ];
+
+  const updateSection = (key: string, field: string, value: string) => {
+    updateConfig('sections', { ...sections, [key]: { ...sections[key], [field]: value } });
+  };
+
+  return (
+    <div className="space-y-6">
+      <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+        <LayoutGrid size={15} className="text-purple-500" />各区块标题配置
+      </h3>
+      <div className="grid gap-4">
+        {sectionFields.map(({ key, label, labelEn }) => (
+          <div key={key} className="bg-slate-50 p-4 rounded-xl border">
+            <h4 className="text-sm font-semibold text-slate-700 mb-3">{label}</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">区块标题</label>
+                <input
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+                  value={sections[key]?.title || ''}
+                  onChange={e => updateSection(key, 'title', e.target.value)}
+                  placeholder={`${label}标题`}
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Section Title (EN)</label>
+                <input
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+                  value={sections[key]?.titleEn || ''}
+                  onChange={e => updateSection(key, 'titleEn', e.target.value)}
+                  placeholder={`${labelEn} Title`}
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">副标题</label>
+                <input
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+                  value={sections[key]?.subtitle || ''}
+                  onChange={e => updateSection(key, 'subtitle', e.target.value)}
+                  placeholder="副标题内容"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Subtitle (EN)</label>
+                <input
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+                  value={sections[key]?.subtitleEn || ''}
+                  onChange={e => updateSection(key, 'subtitleEn', e.target.value)}
+                  placeholder="Subtitle content"
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Star icon for features
+function Star({ size, className }: { size: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
     </svg>
   );
 }

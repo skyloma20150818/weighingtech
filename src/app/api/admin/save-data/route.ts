@@ -16,10 +16,7 @@ export async function GET() {
       solutionVideos,
       companyAlbum,
       products,
-      contact,
-      consult,
-      about,
-      hero
+      siteConfig
     ] = await Promise.all([
       prisma.category.findMany(),
       prisma.albumCategory.findMany(),
@@ -28,33 +25,15 @@ export async function GET() {
       prisma.albumItem.findMany(),
       prisma.product.findMany({
         include: {
-          specs: true,
           documents: true,
           introImages: true,
         },
       }),
-      prisma.contact.findUnique({ where: { id: 1 } }),
-      prisma.consult.findUnique({ where: { id: 1 } }),
-      prisma.about.findUnique({ where: { id: 1 } }),
-      prisma.hero.findUnique({ where: { id: 1 } }),
+      prisma.siteConfig.findUnique({ where: { id: 1 } }),
     ]);
 
-    // Format consult back to the frontend expected format
-    const formattedConsult = consult ? {
-      title: consult.title,
-      description: consult.description,
-      wechat: {
-        enabled: consult.wechatEnabled,
-        label: consult.wechatLabel,
-        qrImage: consult.wechatQrImage,
-      },
-      qq: {
-        enabled: consult.qqEnabled,
-        number: consult.qqNumber,
-        label: consult.qqLabel,
-        qrImage: consult.qqQrImage,
-      },
-    } : null;
+    // Parse JSON fields from siteConfig
+    const parse = (val: any) => typeof val === 'string' ? JSON.parse(val) : val;
 
     return NextResponse.json({
       categories,
@@ -62,11 +41,18 @@ export async function GET() {
       solutionCategories,
       solutionVideos,
       companyAlbum,
-      products,
-      contact,
-      consult: formattedConsult,
-      about,
-      hero
+      products: products.map(p => ({
+        ...p,
+        specs: parse(p.specs)
+      })),
+      siteConfig: siteConfig ? {
+        hero: parse(siteConfig.hero),
+        features: parse(siteConfig.features),
+        about: parse(siteConfig.about),
+        contact: parse(siteConfig.contact),
+        consult: parse(siteConfig.consult),
+        sections: parse(siteConfig.sections),
+      } : null
     });
   } catch (e) {
     console.error('Fetch error:', e);
@@ -83,63 +69,31 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    // In a real migration, we would upsert each item.
-    // For simplicity in this "JSON mirror" editor, we'll implement a basic transaction.
-    // NOTE: This editor seems to send the full state.
-    
     await prisma.$transaction(async (tx) => {
-      // Update Hero
-      if (body.hero) {
-        await tx.hero.upsert({
+      // Update Consolidated Site Config
+      if (body.siteConfig) {
+        await tx.siteConfig.upsert({
           where: { id: 1 },
-          create: { ...body.hero, id: 1 },
-          update: body.hero,
+          create: {
+            id: 1,
+            hero: body.siteConfig.hero,
+            features: body.siteConfig.features,
+            about: body.siteConfig.about,
+            contact: body.siteConfig.contact,
+            consult: body.siteConfig.consult,
+            sections: body.siteConfig.sections,
+          },
+          update: {
+            hero: body.siteConfig.hero,
+            features: body.siteConfig.features,
+            about: body.siteConfig.about,
+            contact: body.siteConfig.contact,
+            consult: body.siteConfig.consult,
+            sections: body.siteConfig.sections,
+          },
         });
       }
 
-      // Update Contact
-      if (body.contact) {
-        await tx.contact.upsert({
-          where: { id: 1 },
-          create: { ...body.contact, id: 1 },
-          update: body.contact,
-        });
-      }
-
-      // Update About
-      if (body.about) {
-        await tx.about.upsert({
-          where: { id: 1 },
-          create: { ...body.about, id: 1 },
-          update: body.about,
-        });
-      }
-
-      // Update Consult (mapping back from nested structure)
-      if (body.consult) {
-        const c = body.consult;
-        const consultData = {
-          title: c.title,
-          description: c.description,
-          wechatEnabled: c.wechat?.enabled ?? false,
-          wechatLabel: c.wechat?.label ?? '',
-          wechatQrImage: c.wechat?.qrImage ?? '',
-          qqEnabled: c.qq?.enabled ?? false,
-          qqNumber: c.qq?.number ?? '',
-          qqLabel: c.qq?.label ?? '',
-          qqQrImage: c.qq?.qrImage ?? '',
-        };
-        await tx.consult.upsert({
-          where: { id: 1 },
-          create: { ...consultData, id: 1 },
-          update: consultData,
-        });
-      }
-
-      // For collections (products, categories, etc.), the simplest way to "mirror" the JSON write
-      // while preserving IDs is to clear and re-insert, or upsert.
-      // Given the editor's design, clearing and re-inserting is closer to its "replace file" behavior.
-      
       if (body.categories) {
         await tx.category.deleteMany();
         await tx.category.createMany({ data: body.categories });
@@ -162,9 +116,7 @@ export async function POST(request: NextRequest) {
       }
 
       if (body.products) {
-        // Products are complex because of nested specs and docs
         await tx.productDocument.deleteMany();
-        await tx.productSpec.deleteMany();
         await tx.productImage.deleteMany();
         await tx.product.deleteMany();
 
@@ -173,13 +125,7 @@ export async function POST(request: NextRequest) {
           await tx.product.create({
             data: {
               ...pData,
-              specs: {
-                create: specs?.map((s: any) => ({
-                  label: s.label,
-                  labelEn: s.labelEn,
-                  value: s.value,
-                })) || [],
-              },
+              specs: specs || null, // Store as native Json
               documents: {
                 create: documents?.map((d: any) => ({
                   title: d.title,

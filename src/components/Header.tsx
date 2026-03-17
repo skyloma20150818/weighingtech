@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
+import Image from 'next/image';
 import { Language, translations } from '../i18n';
 
 interface HeaderProps {
@@ -52,7 +53,14 @@ export default function Header({ lang, onLangChange, phone }: HeaderProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <Link href="/" className="flex items-center">
-            <img src="/logo.png" alt="唯英科技 Logo" className="h-12 object-contain" />
+            <Image 
+              src="/logo.png" 
+              alt="唯英科技 Logo" 
+              width={160}
+              height={48}
+              className="h-12 w-auto object-contain" 
+              priority
+            />
           </Link>
 
           <div className="hidden md:flex space-x-8">
@@ -87,14 +95,6 @@ export default function Header({ lang, onLangChange, phone }: HeaderProps) {
                 EN
               </button>
             </div>
-            {process.env.NODE_ENV === 'development' && (
-              <Link
-                href="/admin"
-                className="ml-4 px-3 py-1.5 text-sm bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition-colors"
-              >
-                管理
-              </Link>
-            )}
           </div>
 
           <div className="md:hidden flex items-center gap-4">
