@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Monitor, Upload, RotateCcw } from 'lucide-react';
+import { Monitor, Upload, RotateCcw, Image } from 'lucide-react';
 import type { HeroConfig } from '../types';
 
 interface HeroSectionEditorProps {
@@ -16,6 +16,55 @@ export function HeroSectionEditor({ config, updateConfig, handleFileUpload }: He
 
   return (
     <div className="space-y-6">
+      {/* 首页首屏背景 */}
+      <div className="bg-slate-50 p-6 rounded-xl border space-y-4">
+        <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+          <Image size={15} className="text-blue-500" />首页首屏背景
+        </h3>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">背景图片</label>
+          <div className="flex gap-4">
+            <div className="w-48 h-28 bg-white border border-slate-200 rounded-lg overflow-hidden relative group">
+              {hero.backgroundImage ? (
+                <img src={hero.backgroundImage} className="w-full h-full object-cover" alt="Hero Background" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-100">
+                  无图片
+                </div>
+              )}
+              <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white cursor-pointer">
+                <Upload size={20} className="mb-1" />
+                <span className="text-[10px]">上传图片</span>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const f = e.target.files?.[0];
+                    if (f) {
+                      const url = await handleFileUpload(f, 'hero');
+                      if (url) updateConfig('hero', { ...hero, backgroundImage: url });
+                    }
+                  }}
+                />
+              </label>
+            </div>
+            <div className="flex-1 flex flex-col justify-center space-y-2">
+              <input
+                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+                value={hero.backgroundImage || ''}
+                onChange={(e) => updateConfig('hero', { ...hero, backgroundImage: e.target.value })}
+                placeholder="背景图片链接"
+              />
+              <p className="text-xs text-slate-500">
+                建议尺寸：1920x1080 像素。不设置则使用默认背景。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 多媒体 */}
       <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
         <Monitor size={15} className="text-blue-500" />首页首屏多媒体
       </h3>
