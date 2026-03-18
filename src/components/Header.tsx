@@ -25,6 +25,7 @@ export default function Header({ lang, onLangChange, phone }: HeaderProps) {
         { id: 'products', label: t.nav.products, href: '#products' },
         { id: 'solutions', label: t.nav.solutions, href: '#solutions' },
         { id: 'album', label: t.nav.album, href: '#album' },
+        { id: 'downloads', label: t.nav.downloads, href: '/downloads' },
         { id: 'about', label: t.nav.about, href: '#about' },
       ]
     : [
@@ -32,6 +33,7 @@ export default function Header({ lang, onLangChange, phone }: HeaderProps) {
         { id: 'products', label: t.nav.products, href: '/#products' },
         { id: 'solutions', label: t.nav.solutions, href: '/#solutions' },
         { id: 'album', label: t.nav.album, href: '/#album' },
+        { id: 'downloads', label: t.nav.downloads, href: '/downloads' },
         { id: 'about', label: t.nav.about, href: '/#about' },
       ];
 

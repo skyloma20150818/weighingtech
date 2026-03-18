@@ -5,7 +5,7 @@ import {
   Play, ShieldCheck, Cpu, Server, Monitor, Smartphone,
   CheckCircle2, FlaskConical, Globe, Share2, Phone, ArrowUpRight,
   CheckCircle, Settings, Wrench, Image as ImageIcon, ZoomIn, RefreshCw, X,
-  Volume2, VolumeX
+  Volume2, VolumeX, Video
 } from 'lucide-react';
 import Product360Viewer from '../components/Product360Viewer';
 import { useRouter } from 'next/navigation';
@@ -317,14 +317,20 @@ export default function HomeClient({ initialData }: HomeClientProps) {
                 className="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 bg-white cursor-pointer"
                 onClick={() => setSelectedVideo(item.videoUrl)}
               >
-                <div className="relative h-48 overflow-hidden">
-                  <Image
-                    src={item.thumbnail}
-                    alt={lang === 'en' && item.titleEn ? item.titleEn : item.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
+                <div className="relative h-48 overflow-hidden bg-slate-200">
+                  {item.thumbnail ? (
+                    <Image
+                      src={item.thumbnail}
+                      alt={lang === 'en' && item.titleEn ? item.titleEn : item.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-400">
+                      <Video size={48} />
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="bg-white/20 backdrop-blur-sm p-4 rounded-full text-white">

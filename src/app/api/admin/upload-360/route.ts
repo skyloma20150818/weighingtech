@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'productCode is required' }, { status: 400 });
     }
 
-    const dirPath = path.join(process.cwd(), 'public', '360', productCode);
+    const dirPath = path.join(process.cwd(), 'public', 'uploads', productCode, '360');
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath, { recursive: true });
     }
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       const buffer = Buffer.from(bytes);
       const fileName = file.name;
       fs.writeFileSync(path.join(dirPath, fileName), buffer);
-      savedFiles.push(`/360/${productCode}/${fileName}`);
+      savedFiles.push(`/uploads/${productCode}/360/${fileName}`);
     }
 
     return NextResponse.json({ saved: savedFiles.length, files: savedFiles });
@@ -52,13 +52,13 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'productCode and filename required' }, { status: 400 });
     }
 
-    const filePath = path.join(process.cwd(), 'public', '360', productCode, filename);
+    const filePath = path.join(process.cwd(), 'public', 'uploads', productCode, '360', filename);
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
     }
 
     // Re-read and report updated count
-    const dirPath = path.join(process.cwd(), 'public', '360', productCode);
+    const dirPath = path.join(process.cwd(), 'public', 'uploads', productCode, '360');
     const remaining = fs.readdirSync(dirPath).filter(f => /\.(png|jpg|jpeg|webp)$/i.test(f)).length;
 
     return NextResponse.json({ success: true, remaining });
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ files: [] });
   }
 
-  const dirPath = path.join(process.cwd(), 'public', '360', productCode);
+  const dirPath = path.join(process.cwd(), 'public', 'uploads', productCode, '360');
   if (!fs.existsSync(dirPath)) {
     return NextResponse.json({ files: [] });
   }
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
       const numB = parseInt(b.split('.')[0]);
       return numA - numB;
     })
-    .map(f => `/360/${productCode}/${f}`);
+    .map(f => `/uploads/${productCode}/360/${f}`);
 
   return NextResponse.json({ files, count: files.length });
 }

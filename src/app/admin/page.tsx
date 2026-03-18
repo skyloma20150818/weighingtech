@@ -1,60 +1,62 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  Save,
+  ChevronRight,
+  Settings,
+  Package,
+  FolderOpen,
+  Image as ImageIcon,
+  Video,
+  FileText,
+  LayoutGrid,
+  CheckCircle2,
+  AlertCircle,
+} from 'lucide-react';
+import {
+  ProductManager,
+  CategoryManager,
+  AlbumManager,
+  VideoManager,
+  DocumentManager,
+  SiteConfigEditor,
+} from '@/components/admin';
+import type { AppData } from '@/components/admin';
 
-// 强制动态渲染，不生成静态页面
 export const dynamic = 'force-dynamic';
 
-import {
-  Save, Upload, Plus, Trash2, Edit2, ChevronRight,
-  Settings, Package, FolderOpen, Image as ImageIcon,
-  Phone, Globe, AlertCircle, CheckCircle, CheckCircle2, X, Download,
-  RotateCcw, Monitor, Users, LayoutGrid,
-  Star, Zap, Shield, Target, Wifi, Cpu, Server, Database,
-  Lock, Unlock, Eye, Fingerprint, Activity, Box, Truck,
-  Factory, Cog, Gauge, Thermometer, Signal, Battery,
-  Cloud, HardDrive, Laptop, Smartphone, Tablet, Printer,
-  Camera, Video, Music, Mic, Volume2, WifiOff, Bluetooth,
-  Mail, MessageSquare, PhoneCall, MapPin, Calendar, Clock,
-  User, Users as Users2, UserCheck, UserPlus, Award, Medal,
-  TrendingUp, TrendingDown, BarChart2, PieChart, LineChart,
-  RefreshCw, Repeat, XCircle, AlertTriangle, Info,
-  HelpCircle, Book, BookOpen, GraduationCap, Lightbulb, Rocket,
-  Globe2, Map, Navigation, Compass, Anchor, Ship, Plane, Car,
-  Bike, Footprints, Home, Building, Building2, Warehouse,
-  ShoppingCart, CreditCard, Wallet, DollarSign, Percent,
-  Tag, Gift, Heart, ThumbsUp, Share2, Link, ExternalLink,
-  Send, Inbox, Mailbox, Paperclip, File, FileText, Folder,
-  Archive, Grid, List, Layout, Maximize2, Minimize2, ZoomIn,
-  ZoomOut, Move, Drag, MousePointer, Hand, Crosshair, Edit3,
-  Eraser, Highlighter, Type, Bold, Italic, Underline, Strikethrough,
-  AlignLeft, AlignCenter, AlignRight, AlignJustify, ListOrdered,
-  ListBullet, Indent, Outdent, Quote, Code, Brackets
-} from 'lucide-react';
-import Editor from 'react-simple-wysiwyg';
+const tabs = [
+  { id: 'products', label: '产品管理', icon: Package },
+  { id: 'categories', label: '分类管理', icon: FolderOpen },
+  { id: 'album', label: '企业相册', icon: ImageIcon },
+  { id: 'videos', label: '解决方案', icon: Video },
+  { id: 'documents', label: '文档管理', icon: FileText },
+  { id: 'siteconfig', label: '网站配置', icon: LayoutGrid },
+];
 
-const DOC_TYPES = ['使用说明书', '安装手册', '驱动程序', 'CAD图纸', '产品规格书', '维护手册', '其他'];
-const FILE_FORMATS = ['PDF', 'ZIP', 'DXF', 'EXE', 'DOC', 'STEP', 'IGES'];
-
-export default function DevEditor() {
+export default function AdminPage() {
   const router = useRouter();
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<AppData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [activeTab, setActiveTab] = useState('products');
 
-  // Admin Editor access is protected by middleware
-  const [editingItem, setEditingItem] = useState<{ index: number; data: any } | null>(null);
-
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const fetchData = async () => {
     try {
       const res = await fetch('/api/admin/save-data');
-      if (res.ok) setData(await res.json());
-      else showMsg('error', '无法加载数据');
+      if (res.ok) {
+        const json = await res.json();
+        setData(json);
+      } else {
+        showMsg('error', '无法加载数据');
+      }
     } catch (e) {
       showMsg('error', '加载失败: ' + (e as Error).message);
     } finally {
@@ -67,20 +69,30 @@ export default function DevEditor() {
     setTimeout(() => setMessage(null), 3000);
   };
 
-  const handleSave = useCallback(async (newData = data) => {
-    setSaving(true);
-    try {
-      const res = await fetch('/api/admin/save-data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newData),
-      });
-      if (res.ok) { showMsg('success', '保存成功'); setData(newData); }
-      else showMsg('error', '保存失败');
-    } catch (e) {
-      showMsg('error', '保存失败: ' + (e as Error).message);
-    } finally { setSaving(false); }
-  }, [data]);
+  const handleSave = useCallback(
+    async (newData = data) => {
+      if (!newData) return;
+      setSaving(true);
+      try {
+        const res = await fetch('/api/admin/save-data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newData),
+        });
+        if (res.ok) {
+          showMsg('success', '保存成功');
+          setData(newData);
+        } else {
+          showMsg('error', '保存失败');
+        }
+      } catch (e) {
+        showMsg('error', '保存失败: ' + (e as Error).message);
+      } finally {
+        setSaving(false);
+      }
+    },
+    [data]
+  );
 
   const handleFileUpload = async (file: File, category: string): Promise<string | null> => {
     const fd = new FormData();
@@ -88,37 +100,28 @@ export default function DevEditor() {
     fd.append('category', category);
     try {
       const res = await fetch('/api/upload-direct', { method: 'POST', body: fd });
-      if (res.ok) return (await res.json()).url;
+      if (res.ok) {
+        const { url } = await res.json();
+        return url;
+      }
       const err = await res.json();
       console.error('Upload error:', err.error);
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
     return null;
   };
 
-  const updateProduct = (index: number, productData: any) => {
-    const nd = { ...data };
-    if (index === -1) nd.products.push({ ...productData, id: Date.now().toString() });
-    else nd.products[index] = productData;
-    handleSave(nd);
-    setEditingItem(null);
-  };
-
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-50">
-      <div className="text-center">
-        <div className="w-10 h-10 border-4 border-[#2B4A7A] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-        <p className="text-sm text-slate-500">加载数据中...</p>
+  if (loading || !data) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-50">
+        <div className="text-center">
+          <div className="w-10 h-10 border-4 border-[#2B4A7A] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <p className="text-sm text-slate-500">加载数据中...</p>
+        </div>
       </div>
-    </div>
-  );
-
-  const tabs = [
-    { id: 'products', label: '产品管理', icon: Package },
-    { id: 'categories', label: '分类管理', icon: FolderOpen },
-    { id: 'album', label: '企业相册', icon: ImageIcon },
-    { id: 'videos', label: '解决方案', icon: Video },
-    { id: 'siteconfig', label: '网站配置', icon: LayoutGrid },
-  ];
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
@@ -129,12 +132,14 @@ export default function DevEditor() {
           <h1 className="text-base font-bold">后台管理系统</h1>
         </div>
         <nav className="flex-1 p-3 space-y-1">
-          {tabs.map(tab => (
+          {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                activeTab === tab.id ? 'bg-white/20 text-white font-medium' : 'text-blue-200 hover:bg-white/10'
+                activeTab === tab.id
+                  ? 'bg-white/20 text-white font-medium'
+                  : 'text-blue-200 hover:bg-white/10'
               }`}
             >
               <tab.icon size={16} />
@@ -152,1527 +157,80 @@ export default function DevEditor() {
       <main className="ml-56 flex-1 p-6 min-h-screen">
         <header className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-bold text-slate-800">{tabs.find(t => t.id === activeTab)?.label}</h2>
+            <h2 className="text-xl font-bold text-slate-800">
+              {tabs.find((t) => t.id === activeTab)?.label}
+            </h2>
             <p className="text-xs text-slate-400 mt-0.5">修改将同步同步到数据库</p>
           </div>
           <div className="flex items-center gap-3">
-            <a href="/" className="text-sm text-[#2B4A7A] hover:underline">← 返回前台</a>
+            <a href="/" className="text-sm text-[#2B4A7A] hover:underline">
+              ← 返回前台
+            </a>
             <button
               onClick={() => handleSave()}
               disabled={saving}
               className="bg-[#2B4A7A] text-white px-4 py-2 rounded-lg hover:bg-[#1C3359] disabled:opacity-50 flex items-center gap-2 text-sm font-medium"
             >
-              {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save size={16} />}
+              {saving ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Save size={16} />
+              )}
               保存
             </button>
           </div>
         </header>
 
         {message && (
-          <div className={`mb-5 p-3 rounded-lg flex items-center gap-2.5 text-sm ${
-            message.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'
-          }`}>
+          <div
+            className={`mb-5 p-3 rounded-lg flex items-center gap-2.5 text-sm ${
+              message.type === 'success'
+                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                : 'bg-red-50 text-red-700 border border-red-200'
+            }`}
+          >
             {message.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
             {message.text}
           </div>
         )}
 
         <div className="bg-white rounded-xl p-6">
-
-          {/* ——— 产品管理 ——— */}
           {activeTab === 'products' && (
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <p className="text-sm text-slate-500">共 {data.products.length} 个产品</p>
-                <button
-                  onClick={() => setEditingItem({ index: -1, data: { name: '', nameEn: '', code: '', category: data.categories[1]?.id || '', description: '', descriptionEn: '', image: '', specs: [], documents: [] } })}
-                  className="bg-[#2B4A7A] text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5"
-                >
-                  <Plus size={15} /> 新增产品
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-                {data.products.map((p: any, i: number) => (
-                  <div key={p.id} className="rounded-xl p-4 flex gap-3 hover:bg-slate-50 transition-colors group relative">
-                    {p.image ? (
-                      <img src={p.image} className="w-16 h-16 object-contain rounded-lg bg-slate-50 flex-shrink-0" alt={p.name} />
-                    ) : (
-                      <div className="w-16 h-16 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
-                        <ImageIcon size={24} className="text-slate-300" />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-semibold text-slate-800 truncate">{p.name}</h4>
-                      <p className="text-xs text-slate-400 font-mono mt-0.5">{p.code}</p>
-                      <span className="inline-block mt-1.5 px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] rounded font-medium">
-                        {data.categories.find((c: any) => c.id === p.category)?.name || p.category}
-                      </span>
-                    </div>
-                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => setEditingItem({ index: i, data: { ...p } })} className="p-1.5 bg-white text-blue-600 rounded hover:bg-blue-50">
-                        <Edit2 size={13} />
-                      </button>
-                      <button onClick={() => { if (confirm('确认删除该产品?')) { const nd = { ...data }; nd.products.splice(i, 1); handleSave(nd); } }} className="p-1.5 bg-white text-red-500 rounded hover:bg-red-50">
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ProductManager data={data} onSave={handleSave} handleFileUpload={handleFileUpload} />
           )}
-
-          {/* ——— 分类管理 ——— */}
           {activeTab === 'categories' && (
-            <div className="space-y-8">
-              {(['categories', 'albumCategories', 'solutionCategories'] as const).map(key => (
-                <CategoryTable
-                  key={key}
-                  title={key === 'categories' ? '产品分类' : key === 'albumCategories' ? '相册分类' : '视频分类'}
-                  items={data[key]}
-                  onUpdate={(items: any[]) => { const nd = { ...data }; nd[key] = items; handleSave(nd); }}
-                />
-              ))}
-            </div>
+            <CategoryManager
+              data={{
+                categories: data.categories,
+                albumCategories: data.albumCategories,
+                solutionCategories: data.solutionCategories,
+              }}
+              onSave={handleSave}
+            />
           )}
-
-          {/* ——— 企业相册 ——— */}
           {activeTab === 'album' && (
-            <AlbumEditor data={data} handleSave={handleSave} handleFileUpload={handleFileUpload} />
+            <AlbumManager
+              data={{ companyAlbum: data.companyAlbum, albumCategories: data.albumCategories }}
+              onSave={handleSave}
+              handleFileUpload={handleFileUpload}
+            />
           )}
-
-          {/* ——— 解决方案视频 ——— */}
           {activeTab === 'videos' && (
-            <VideoEditor data={data} handleSave={handleSave} handleFileUpload={handleFileUpload} />
+            <VideoManager
+              data={{
+                solutionVideos: data.solutionVideos,
+                solutionCategories: data.solutionCategories,
+              }}
+              onSave={handleSave}
+              handleFileUpload={handleFileUpload}
+            />
           )}
-
-          {/* ——— 网站配置 ——— */}
+          {activeTab === 'documents' && <DocumentManager />}
           {activeTab === 'siteconfig' && (
-            <SiteConfigEditor data={data} handleSave={handleSave} handleFileUpload={handleFileUpload} />
+            <SiteConfigEditor data={data} onSave={handleSave} handleFileUpload={handleFileUpload} />
           )}
-
         </div>
       </main>
-
-      {/* 产品编辑弹窗 */}
-      {editingItem && (
-        <ProductForm
-          data={data}
-          item={editingItem.data}
-          onClose={() => setEditingItem(null)}
-          onSave={(p: any) => updateProduct(editingItem.index, p)}
-          upload={handleFileUpload}
-        />
-      )}
-    </div>
-  );
-}
-
-/* ==================== 分类表格 ==================== */
-function CategoryTable({ title, items, onUpdate }: { title: string; items: any[]; onUpdate: (items: any[]) => void }) {
-  const [rows, setRows] = useState(items);
-
-  const update = (i: number, field: string, val: string) => {
-    const nr = [...rows]; nr[i] = { ...nr[i], [field]: val }; setRows(nr);
-  };
-
-  const addRow = () => {
-    setRows([...rows, { id: '', name: '', nameEn: '' }]);
-  };
-
-  const removeRow = (i: number) => {
-    if (rows[i].id === 'all') return alert('"全部" 分类不可删除');
-    const nr = rows.filter((_, idx) => idx !== i);
-    setRows(nr);
-    onUpdate(nr);
-  };
-
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-slate-700">{title}</h3>
-        <button onClick={addRow} className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1">
-          <Plus size={13} /> 新增
-        </button>
-      </div>
-      <div className="rounded-xl overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-slate-50">
-            <tr>
-              <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 w-36">ID (唯一标识)</th>
-              <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500">中文名</th>
-              <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500">英文名</th>
-              <th className="w-10"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, i) => (
-              <tr key={i} className="">
-                <td className="px-4 py-2">
-                  <input
-                    className="w-full text-xs font-mono bg-transparent outline-none py-1 bg-slate-50 rounded px-2"
-                    value={row.id}
-                    placeholder="e.g. platform_scale"
-                    disabled={row.id === 'all'}
-                    onChange={e => update(i, 'id', e.target.value)}
-                    onBlur={() => onUpdate(rows)}
-                  />
-                </td>
-                <td className="px-4 py-2">
-                  <input
-                    className="w-full text-sm bg-transparent outline-none py-1 bg-slate-50 rounded px-2"
-                    value={row.name}
-                    placeholder="中文名称"
-                    onChange={e => update(i, 'name', e.target.value)}
-                    onBlur={() => onUpdate(rows)}
-                  />
-                </td>
-                <td className="px-4 py-2">
-                  <input
-                    className="w-full text-sm bg-transparent outline-none py-1 bg-slate-50 rounded px-2"
-                    value={row.nameEn || ''}
-                    placeholder="English Name"
-                    onChange={e => update(i, 'nameEn', e.target.value)}
-                    onBlur={() => onUpdate(rows)}
-                  />
-                </td>
-                <td className="px-2 py-2 text-center">
-                  {row.id !== 'all' && (
-                    <button onClick={() => removeRow(i)} className="text-slate-300 hover:text-red-500 p-1">
-                      <X size={14} />
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-/* ==================== 企业相册编辑器 ==================== */
-function AlbumEditor({ data, handleSave, handleFileUpload }: any) {
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <p className="text-sm text-slate-500">共 {data.companyAlbum.length} 张</p>
-        <button
-          onClick={() => { const nd = { ...data }; nd.companyAlbum.push({ id: `a${Date.now()}`, title: '新图片', titleEn: 'New Image', category: 'all', image: '' }); handleSave(nd); }}
-          className="bg-[#2B4A7A] text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5"
-        >
-          <Plus size={15} /> 添加
-        </button>
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
-        {data.companyAlbum.map((item: any, i: number) => (
-          <div key={item.id} className="rounded-xl overflow-hidden bg-slate-50 relative group">
-            <div className="aspect-square bg-white relative">
-              {item.image ? <img src={item.image} className="w-full h-full object-cover" alt="" /> : <div className="w-full h-full flex items-center justify-center text-slate-200"><ImageIcon size={36} /></div>}
-              <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity">
-                <Upload className="text-white" size={20} />
-                <input type="file" className="hidden" accept="image/*" onChange={async (e) => {
-                  const f = e.target.files?.[0];
-                  if (f) { const url = await handleFileUpload(f, 'albums'); if (url) { const nd = { ...data }; nd.companyAlbum[i].image = url; handleSave(nd); } }
-                }} />
-              </label>
-            </div>
-            <div className="p-2 space-y-1">
-              <input className="w-full bg-transparent text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-400 rounded px-1" value={item.title} onChange={e => { const nd = { ...data }; nd.companyAlbum[i].title = e.target.value; }} onBlur={() => handleSave(data)} placeholder="中文标题" />
-              <input className="w-full bg-transparent text-xs text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-400 rounded px-1" value={item.titleEn || ''} onChange={e => { const nd = { ...data }; nd.companyAlbum[i].titleEn = e.target.value; }} onBlur={() => handleSave(data)} placeholder="English Title" />
-              <select className="w-full mt-1 text-[10px] bg-slate-100 rounded px-1 py-0.5" value={item.category} onChange={e => { const nd = { ...data }; nd.companyAlbum[i].category = e.target.value; handleSave(nd); }}>
-                {data.albumCategories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
-            </div>
-            <button onClick={() => { if (confirm('删除?')) { const nd = { ...data }; nd.companyAlbum.splice(i, 1); handleSave(nd); } }} className="absolute top-1.5 right-1.5 p-1 bg-black/50 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity">
-              <Trash2 size={12} />
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ==================== 视频编辑器 ==================== */
-function VideoEditor({ data, handleSave, handleFileUpload }: any) {
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <p className="text-sm text-slate-500">共 {data.solutionVideos.length} 条</p>
-        <button onClick={() => { const nd = { ...data }; nd.solutionVideos.push({ id: `v${Date.now()}`, title: '新视频', titleEn: 'New Video', category: 'all', thumbnail: '', videoUrl: '' }); handleSave(nd); }} className="bg-[#2B4A7A] text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5">
-          <Plus size={15} /> 添加
-        </button>
-      </div>
-      <div className="space-y-3">
-        {data.solutionVideos.map((item: any, i: number) => (
-          <div key={item.id} className="rounded-xl p-4 flex gap-4 group relative hover:bg-slate-50 transition-colors bg-white">
-            <div className="w-28 h-18 bg-slate-100 rounded-lg relative overflow-hidden flex-shrink-0 aspect-video">
-              {item.thumbnail ? <img src={item.thumbnail} className="w-full h-full object-cover" alt="" /> : <div className="w-full h-full flex items-center justify-center text-slate-300"><Video size={20} /></div>}
-              <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity">
-                <ImageIcon className="text-white" size={18} />
-                <input type="file" className="hidden" accept="image/*" onChange={async e => {
-                  const f = e.target.files?.[0]; if (f) { const url = await handleFileUpload(f, 'videos'); if (url) { const nd = {...data}; nd.solutionVideos[i].thumbnail = url; handleSave(nd); } }
-                }} />
-              </label>
-            </div>
-            <div className="flex-1 grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs text-slate-400 mb-1">中文标题</label>
-                <input className="w-full bg-slate-50 rounded text-sm focus:outline-none py-1 px-2" value={item.title} onChange={e => { data.solutionVideos[i].title = e.target.value; }} onBlur={() => handleSave(data)} />
-              </div>
-              <div>
-                <label className="block text-xs text-slate-400 mb-1">English Title</label>
-                <input className="w-full bg-slate-50 rounded text-sm focus:outline-none py-1 px-2" value={item.titleEn || ''} onChange={e => { data.solutionVideos[i].titleEn = e.target.value; }} onBlur={() => handleSave(data)} />
-              </div>
-              <div>
-                <label className="block text-xs text-slate-400 mb-1">视频链接/文件</label>
-                <div className="flex gap-2 items-center">
-                  <input className="flex-1 bg-slate-50 rounded text-xs font-mono focus:outline-none py-1 px-2" value={item.videoUrl} onChange={e => { data.solutionVideos[i].videoUrl = e.target.value; }} onBlur={() => handleSave(data)} />
-                  <label className="cursor-pointer text-slate-400 hover:text-slate-600">
-                    <Upload size={14} />
-                    <input type="file" className="hidden" accept="video/*" onChange={async e => { const f = e.target.files?.[0]; if (f) { const url = await handleFileUpload(f, 'videos'); if (url) { const nd = {...data}; nd.solutionVideos[i].videoUrl = url; handleSave(nd); } } }} />
-                  </label>
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs text-slate-400 mb-1">分类</label>
-                <select className="w-full text-sm bg-slate-50 rounded py-1 px-2" value={item.category} onChange={e => { data.solutionVideos[i].category = e.target.value; handleSave(data); }}>
-                  {data.solutionCategories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
-              </div>
-            </div>
-            <button onClick={() => { if (confirm('删除?')) { const nd = {...data}; nd.solutionVideos.splice(i, 1); handleSave(nd); } }} className="absolute top-3 right-3 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100">
-              <X size={15} />
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ==================== 联系方式编辑器 ==================== */
-function ContactEditor({ data, handleSave, handleFileUpload }: any) {
-  return (
-    <div className="grid md:grid-cols-2 gap-10">
-      <div>
-        <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2"><Phone size={15} className="text-blue-500" />基础联系方式</h3>
-        <div className="space-y-3">
-          {[
-            { key: 'phone', label: '固话' },
-            { key: 'mobile', label: '手机' },
-            { key: 'email', label: '邮箱' },
-            { key: 'address', label: '地址' },
-          ].map(({ key, label }) => (
-            <div key={key}>
-              <label className="block text-xs text-slate-400 mb-1">{label}</label>
-              <input
-                className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none"
-                value={data.contact[key] || ''}
-                onChange={e => { const nd = {...data}; nd.contact[key] = e.target.value; handleSave(nd); }}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-      <div>
-        <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2"><Globe size={15} className="text-emerald-500" />在线咨询 (扫码)</h3>
-        <div className="space-y-4 p-4 bg-slate-50 rounded-xl border">
-          <div>
-            <label className="block text-xs text-slate-400 mb-1">标题</label>
-            <input className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none" value={data.consult?.title || ''} onChange={e => { data.consult.title = e.target.value; handleSave(data); }} />
-          </div>
-          <div>
-            <label className="block text-xs text-slate-400 mb-1">描述</label>
-            <textarea className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none" rows={2} value={data.consult?.description || ''} onChange={e => { data.consult.description = e.target.value; handleSave(data); }} />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            {['wechat', 'qq'].map(type => (
-              <div key={type} className="bg-white p-3 rounded-lg border">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold uppercase text-slate-600">{type}</span>
-                  <input type="checkbox" checked={data.consult?.[type]?.enabled ?? false} onChange={e => { data.consult[type].enabled = e.target.checked; handleSave(data); }} />
-                </div>
-                <div className="aspect-square bg-slate-50 rounded-lg relative overflow-hidden">
-                  {data.consult?.[type]?.qrImage ? <img src={data.consult[type].qrImage} className="w-full h-full object-contain" alt="" /> : <div className="w-full h-full flex items-center justify-center text-slate-300 text-xs">暂无二维码</div>}
-                  <label className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity">
-                    <Upload className="text-white" size={18} />
-                    <input type="file" className="hidden" accept="image/*" onChange={async e => {
-                      const f = e.target.files?.[0]; if (f) { const url = await handleFileUpload(f, 'others'); if (url) { const nd = {...data}; nd.consult[type].qrImage = url; handleSave(nd); } }
-                    }} />
-                  </label>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ==================== 首页首屏编辑器 ==================== */
-function HeroEditor({ data, handleSave, handleFileUpload }: any) {
-  if (!data.hero) data.hero = { videoUrl: '', poster: '' };
-  const [extracting, setExtracting] = useState(false);
-  
-  return (
-    <div className="space-y-6">
-      <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2"><Monitor size={15} className="text-blue-500" />首页首屏多媒体</h3>
-      <div className="bg-slate-50 p-6 rounded-xl border space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">背景视频 (MP4)</label>
-          <div className="flex gap-3 items-center">
-            <input 
-              className="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none" 
-              value={data.hero?.videoUrl || ''} 
-              onChange={e => { data.hero.videoUrl = e.target.value; handleSave(data); }} 
-              placeholder="例如: /uploads/videos/hero-video.mp4 或是外部链接"
-            />
-            <label className={`cursor-pointer bg-white border border-slate-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 flex items-center gap-2 transition-colors ${extracting ? 'opacity-70 cursor-not-allowed' : ''}`}>
-              {extracting ? <RotateCcw size={16} className="text-blue-500 animate-spin" /> : <Upload size={16} className="text-slate-500" />} 
-              {extracting ? '上传及处理中...' : '上传视频'}
-              <input type="file" className="hidden" accept="video/*" disabled={extracting} onChange={async e => { 
-                const f = e.target.files?.[0]; 
-                if (f) { 
-                  setExtracting(true);
-                  try {
-                    const url = await handleFileUpload(f, 'videos'); 
-                    if (url) { 
-                      const nd = {...data}; 
-                      if (!nd.hero) nd.hero = {};
-                      nd.hero.videoUrl = url; 
-
-                      // 自动提取视频第一帧作为封面图
-                      const frameFile = await new Promise<File | null>((resolve) => {
-                        const video = document.createElement('video');
-                        const objUrl = URL.createObjectURL(f);
-                        video.src = objUrl;
-                        video.muted = true;
-                        video.playsInline = true;
-                        video.onloadeddata = () => { 
-                          video.currentTime = Math.min(0.5, video.duration / 2 || 0.5); 
-                        };
-                        video.onseeked = () => {
-                          const canvas = document.createElement('canvas');
-                          canvas.width = video.videoWidth || 1920;
-                          canvas.height = video.videoHeight || 1080;
-                          const ctx = canvas.getContext('2d');
-                          ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
-                          canvas.toBlob((blob) => {
-                            if (blob) {
-                              resolve(new File([blob], f.name.replace(/\.[^/.]+$/, "") + "_poster.jpg", { type: 'image/jpeg' }));
-                            } else {
-                              resolve(null);
-                            }
-                            URL.revokeObjectURL(objUrl);
-                          }, 'image/jpeg', 0.8);
-                        };
-                        video.onerror = () => { URL.revokeObjectURL(objUrl); resolve(null); };
-                      });
-
-                      if (frameFile) {
-                        const posterUrl = await handleFileUpload(frameFile, 'hero');
-                        if (posterUrl) {
-                          nd.hero.poster = posterUrl;
-                        }
-                      }
-                      
-                      handleSave(nd); 
-                    } 
-                  } catch (err) {
-                    console.error("上传或截图失败", err);
-                  } finally {
-                    setExtracting(false);
-                  }
-                } 
-              }} />
-            </label>
-          </div>
-          <p className="text-xs text-slate-500 mt-2">推荐尺寸 1920x1080，大小不要超过 20MB。上传后将自动提取第0.5秒作为海报封面。</p>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">封面图片 (海报/备用图)</label>
-          <div className="flex gap-4">
-            <div className="w-48 h-28 bg-white border border-slate-200 rounded-lg overflow-hidden relative group">
-              {data.hero?.poster ? (
-                <img src={data.hero.poster} className="w-full h-full object-cover" alt="Hero Poster" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-100">无图片</div>
-              )}
-              <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white cursor-pointer">
-                <Upload size={20} className="mb-1" />
-                <span className="text-[10px]">上传图片</span>
-                <input type="file" className="hidden" accept="image/*" onChange={async e => {
-                  const f = e.target.files?.[0]; 
-                  if (f) { 
-                    const url = await handleFileUpload(f, 'hero'); 
-                    if (url) { 
-                      const nd = {...data}; 
-                      if (!nd.hero) nd.hero = {};
-                      nd.hero.poster = url; 
-                      handleSave(nd); 
-                    } 
-                  }
-                }} />
-              </label>
-            </div>
-            <div className="flex-1 flex flex-col justify-center space-y-2">
-              <input 
-                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none" 
-                value={data.hero?.poster || ''} 
-                onChange={e => { data.hero.poster = e.target.value; handleSave(data); }} 
-                placeholder="图片链接"
-              />
-              <p className="text-xs text-slate-500">此图片用作视频加载前的海报图。上传视频时已自动生成，你也可以单独上传覆盖该图。</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ==================== 产品编辑弹窗 ==================== */
-function ProductForm({ data, item, onClose, onSave, upload }: any) {
-  const [form, setForm] = useState<any>(item);
-  const [images360, setImages360] = useState<string[]>([]);
-  const [loading360, setLoading360] = useState(false);
-  const [uploading360, setUploading360] = useState(false);
-
-  // 加载已有的360图片
-  const load360Images = useCallback(async (code: string) => {
-    if (!code) return;
-    setLoading360(true);
-    try {
-      const res = await fetch(`/api/admin/upload-360?productCode=${encodeURIComponent(code)}`);
-      if (res.ok) {
-        const { files, count } = await res.json();
-        setImages360(files);
-        setForm((prev: any) => ({ ...prev, has360: count > 0, images360Count: count }));
-      }
-    } finally { setLoading360(false); }
-  }, []);
-
-  useEffect(() => {
-    if (form.code) load360Images(form.code);
-  }, []);
-
-  const upload360Images = async (files: FileList) => {
-    if (!form.code) return alert('请先填写产品编码');
-    setUploading360(true);
-    try {
-      const fd = new FormData();
-      fd.append('productCode', form.code);
-      Array.from(files).forEach(f => fd.append('files', f));
-      const res = await fetch('/api/admin/upload-360', { method: 'POST', body: fd });
-      if (res.ok) {
-        await load360Images(form.code);
-      }
-    } finally { setUploading360(false); }
-  };
-
-  const delete360Image = async (filename: string) => {
-    const res = await fetch('/api/admin/upload-360', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ productCode: form.code, filename }),
-    });
-    if (res.ok) await load360Images(form.code);
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden">
-
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b bg-slate-50">
-          <div>
-            <h3 className="text-base font-bold text-slate-800">编辑产品信息</h3>
-            <p className="text-xs text-slate-400 mt-0.5">点击「保存」提交所有更改</p>
-          </div>
-          <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition-colors"><X size={18} /></button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-6 space-y-8">
-
-          {/* === Section 1: 基础信息 === */}
-          <section>
-            <SectionTitle num="1" label="基础识别信息" />
-            <div className="grid grid-cols-2 gap-4 mt-4">
-              <div className="col-span-2 md:col-span-1">
-                <FormField label="产品名称 (中文)">
-                  <input className={inputCls} value={form.name || ''} onChange={e => setForm({...form, name: e.target.value})} />
-                </FormField>
-              </div>
-              <div className="col-span-2 md:col-span-1">
-                <FormField label="Product Name (English)">
-                  <input className={inputCls} value={form.nameEn || ''} onChange={e => setForm({...form, nameEn: e.target.value})} />
-                </FormField>
-              </div>
-              <div>
-                <FormField label="产品编码">
-                  <input className={`${inputCls} font-mono`} value={form.code || ''} onChange={e => setForm({...form, code: e.target.value})} onBlur={() => form.code && load360Images(form.code)} />
-                </FormField>
-              </div>
-              <div>
-                <FormField label="所属分类">
-                  <select className={inputCls} value={form.category || ''} onChange={e => setForm({...form, category: e.target.value})}>
-                    {data.categories.filter((c: any) => c.id !== 'all').map((c: any) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </FormField>
-              </div>
-              <div className="col-span-2">
-                <FormField label="产品描述 (中文)">
-                  <div className="border rounded-lg bg-white overflow-hidden">
-                    <Editor 
-                      value={form.description || ''} 
-                      onChange={e => setForm({...form, description: e.target.value})} 
-                      containerProps={{ style: { height: '300px', overflowY: 'auto' } }}
-                    />
-                  </div>
-                </FormField>
-              </div>
-              <div className="col-span-2">
-                <FormField label="Description (English)">
-                  <div className="border rounded-lg bg-white overflow-hidden">
-                    <Editor 
-                      value={form.descriptionEn || ''} 
-                      onChange={e => setForm({...form, descriptionEn: e.target.value})} 
-                      containerProps={{ style: { height: '300px', overflowY: 'auto' } }}
-                    />
-                  </div>
-                </FormField>
-              </div>
-            </div>
-          </section>
-
-          {/* === Section 2: 封面图 === */}
-          <section>
-            <SectionTitle num="2" label="封面主图" />
-            <div className="mt-4 flex gap-4 items-start">
-              <div className="w-40 h-40 rounded-xl border-2 border-dashed border-slate-200 relative overflow-hidden flex items-center justify-center bg-slate-50 group flex-shrink-0">
-                {form.image ? <img src={form.image} className="w-full h-full object-contain" alt="" /> : <ImageIcon className="text-slate-300" size={36} />}
-                <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white cursor-pointer">
-                  <Upload size={22} className="mb-1" />
-                  <span className="text-xs font-medium">上传图片</span>
-                  <input type="file" className="hidden" accept="image/*" onChange={async e => {
-                    const f = e.target.files?.[0]; if (f) { const url = await upload(f, 'products'); if (url) setForm({...form, image: url}); }
-                  }} />
-                </label>
-              </div>
-              <div className="text-xs text-slate-400 leading-relaxed pt-2">
-                <p>• 建议尺寸：800×800px 或以上</p>
-                <p>• 支持格式：JPG / PNG / WebP</p>
-                <p>• 建议白色或透明背景</p>
-                {form.image && <p className="text-blue-500 mt-2 font-mono break-all">{form.image}</p>}
-              </div>
-            </div>
-          </section>
-
-          {/* === Section 3: 360° 图片上传 === */}
-          <section>
-            <div className="flex items-center justify-between">
-              <SectionTitle num="3" label="360° 交互图片序列" />
-              {loading360 && <span className="text-xs text-blue-500 animate-pulse">加载中...</span>}
-              {images360.length > 0 && <span className="text-xs text-emerald-600 font-medium">已有 {images360.length} 张</span>}
-            </div>
-            <div className="mt-4 space-y-3">
-              <div className="text-xs text-slate-400 bg-slate-50 rounded-lg p-3 leading-relaxed">
-                上传后图片将按顺序命名为 1.png、2.png...，存储至 <code className="bg-slate-200 px-1 rounded">/public/360/{form.code || '[产品编码]'}/</code>。上传前请确保已填写产品编码。
-              </div>
-              {/* 图片网格 */}
-              <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
-                {images360.map((src, i) => {
-                  const filename = src.split('/').pop() || '';
-                  return (
-                    <div key={i} className="relative group aspect-square rounded-lg overflow-hidden border bg-slate-50">
-                      <img src={src} className="w-full h-full object-cover" alt="" />
-                      <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[9px] text-center py-0.5">{i + 1}</div>
-                      <button
-                        onClick={() => { if (confirm(`删除第 ${i+1} 张?`)) delete360Image(filename); }}
-                        className="absolute top-1 right-1 p-0.5 bg-red-500 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <X size={10} />
-                      </button>
-                    </div>
-                  );
-                })}
-                {/* 上传按钮 */}
-                <label className="aspect-square rounded-lg border-2 border-dashed border-blue-200 flex flex-col items-center justify-center text-blue-400 hover:border-blue-400 hover:text-blue-600 transition-all cursor-pointer bg-blue-50/50">
-                  {uploading360 ? (
-                    <RotateCcw size={18} className="animate-spin" />
-                  ) : (
-                    <>
-                      <Plus size={20} />
-                      <span className="text-[10px] mt-0.5 font-medium">上传</span>
-                    </>
-                  )}
-                  <input type="file" className="hidden" accept="image/*" multiple disabled={uploading360} onChange={e => { if (e.target.files?.length) upload360Images(e.target.files); }} />
-                </label>
-              </div>
-            </div>
-          </section>
-
-          {/* === Section 4: 技术规格 === */}
-          <section>
-            <div className="flex items-center justify-between">
-              <SectionTitle num="4" label="技术规格参数" />
-              <button onClick={() => setForm({...form, specs: [...(form.specs||[]), {label: '', labelEn: '', value: ''}]})} className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1">
-                <Plus size={13} /> 新增行
-              </button>
-            </div>
-            <div className="mt-4 border rounded-xl overflow-hidden">
-              {(form.specs || []).length === 0 ? (
-                <div className="text-center py-6 text-sm text-slate-400">暂无规格，点击「新增行」添加</div>
-              ) : (
-                <table className="w-full text-sm">
-                  <thead className="bg-slate-50">
-                    <tr>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-500">中文参数名</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-500">English Label</th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-500">数值</th>
-                      <th className="w-8"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(form.specs || []).map((s: any, i: number) => (
-                      <tr key={i} className="">
-                        <td className="px-3 py-2">
-                          <input className="w-full text-sm bg-slate-50 rounded outline-none py-1 px-2" placeholder="e.g. 工作电压" value={s.label} onChange={e => { const n = [...form.specs]; n[i].label = e.target.value; setForm({...form, specs: n}); }} />
-                        </td>
-                        <td className="px-3 py-2">
-                          <input className="w-full text-sm bg-slate-50 rounded outline-none py-1 px-2" placeholder="e.g. Working Voltage" value={s.labelEn || ''} onChange={e => { const n = [...form.specs]; n[i].labelEn = e.target.value; setForm({...form, specs: n}); }} />
-                        </td>
-                        <td className="px-3 py-2">
-                          <input className="w-full text-sm bg-slate-50 rounded outline-none py-1 px-2" placeholder="e.g. 480V / 3相" value={s.value} onChange={e => { const n = [...form.specs]; n[i].value = e.target.value; setForm({...form, specs: n}); }} />
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          <button onClick={() => { const n = [...form.specs]; n.splice(i, 1); setForm({...form, specs: n}); }} className="text-slate-300 hover:text-red-500">
-                            <X size={14} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          </section>
-
-
-          {/* === Section 6: 文档下载 === */}
-          <section>
-            <div className="flex items-center justify-between">
-              <SectionTitle num="6" label="文档下载资料" />
-              <button
-                onClick={() => setForm({...form, documents: [...(form.documents||[]), { title: '', titleEn: '', docType: '使用说明书', format: 'PDF', fileSize: '', url: '' }]})}
-                className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1"
-              >
-                <Plus size={13} /> 新增文档
-              </button>
-            </div>
-            <div className="mt-4 space-y-3">
-              {(form.documents || []).length === 0 && (
-                <div className="text-center py-6 text-sm text-slate-400 rounded-xl bg-slate-50">暂无文档，点击「新增文档」添加</div>
-              )}
-              {(form.documents || []).map((d: any, i: number) => (
-                <div key={i} className="rounded-xl p-4 grid grid-cols-2 gap-3 relative group hover:bg-slate-50 transition-colors">
-                  <div>
-                    <label className="block text-xs text-slate-400 mb-1">文档标题 (中)</label>
-                    <input className={inputCls} placeholder="e.g. 安装使用手册" value={d.title || ''} onChange={e => { const n = [...form.documents]; n[i].title = e.target.value; setForm({...form, documents: n}); }} />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-slate-400 mb-1">Document Title (EN)</label>
-                    <input className={inputCls} placeholder="e.g. Installation Manual" value={d.titleEn || ''} onChange={e => { const n = [...form.documents]; n[i].titleEn = e.target.value; setForm({...form, documents: n}); }} />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-slate-400 mb-1">文档描述 (中)</label>
-                    <input className={inputCls} placeholder="e.g. 含安装步骤与注意事项" value={d.description || ''} onChange={e => { const n = [...form.documents]; n[i].description = e.target.value; setForm({...form, documents: n}); }} />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-slate-400 mb-1">Description (EN)</label>
-                    <input className={inputCls} placeholder="e.g. Including installation steps" value={d.descriptionEn || ''} onChange={e => { const n = [...form.documents]; n[i].descriptionEn = e.target.value; setForm({...form, documents: n}); }} />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-slate-400 mb-1">文档类型</label>
-                    <select className={inputCls} value={d.docType || '使用说明书'} onChange={e => { const n = [...form.documents]; n[i].docType = e.target.value; setForm({...form, documents: n}); }}>
-                      {DOC_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-slate-400 mb-1">文件格式</label>
-                    <select className={inputCls} value={d.format || 'PDF'} onChange={e => { const n = [...form.documents]; n[i].format = e.target.value; setForm({...form, documents: n}); }}>
-                      {FILE_FORMATS.map(f => <option key={f} value={f}>{f}</option>)}
-                    </select>
-                  </div>
-                  <div className="col-span-2">
-                    <label className="block text-xs text-slate-400 mb-1">上传文件</label>
-                    <div className="flex gap-2 items-center">
-                      <span className={`flex-1 text-xs font-mono text-slate-400 px-3 py-2 border rounded-lg bg-slate-50 truncate ${d.url ? 'text-blue-600' : ''}`}>{d.url || '未上传'}</span>
-                      <label className="flex items-center gap-1.5 px-3 py-2 bg-[#2B4A7A] text-white text-xs rounded-lg cursor-pointer hover:bg-[#1C3359] transition-colors whitespace-nowrap">
-                        <Upload size={13} /> 上传文档
-                        <input type="file" className="hidden" onChange={async e => {
-                          const f = e.target.files?.[0]; if (f) {
-                            const url = await upload(f, 'documents');
-                            if (url) {
-                              const ext = f.name.split('.').pop()?.toUpperCase() || 'PDF';
-                              const size = f.size < 1024 * 1024 ? `${(f.size/1024).toFixed(0)} KB` : `${(f.size/1024/1024).toFixed(1)} MB`;
-                              const n = [...form.documents]; n[i] = {...n[i], url, format: ext, fileSize: size }; setForm({...form, documents: n});
-                            }
-                          }
-                        }} />
-                      </label>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => { const n = [...form.documents]; n.splice(i, 1); setForm({...form, documents: n}); }}
-                    className="absolute top-3 right-3 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <X size={15} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </section>
-
-        </div>
-
-        {/* Footer */}
-        <div className="flex justify-end gap-3 px-6 py-4 border-t bg-slate-50">
-          <button onClick={onClose} className="px-6 py-2 border rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors">取消</button>
-          <button onClick={() => onSave(form)} className="px-10 py-2 bg-[#2B4A7A] text-white rounded-xl text-sm font-bold hover:bg-[#1C3359] shadow-md transition-all">保存修改</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ==================== Helper Components ==================== */
-const inputCls = 'w-full h-9 border rounded-lg px-3 text-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none bg-white';
-
-function SectionTitle({ num, label }: { num: string; label: string }) {
-  return (
-    <div className="flex items-center gap-2">
-      <span className="w-5 h-5 rounded-full bg-[#2B4A7A] text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">{num}</span>
-      <h4 className="text-sm font-semibold text-slate-700">{label}</h4>
-    </div>
-  );
-}
-
-function FormField({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="block text-xs text-slate-400 mb-1.5">{label}</label>
-      {children}
-    </div>
-  );
-}
-
-// Video icon for VideoEditor (needed in a sub-component)
-function Video({ size, className }: { size: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <polygon points="23 7 16 12 23 17 23 7" />
-      <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-    </svg>
-  );
-}
-
-/* ==================== 网站配置编辑器 ==================== */
-function SiteConfigEditor({ data, handleSave, handleFileUpload }: any) {
-  const [activeSubTab, setActiveSubTab] = useState('hero');
-
-  // 获取配置数据，支持向后兼容
-  const getConfig = () => {
-    const siteConfig = data.siteConfig || {};
-    return {
-      hero: siteConfig.hero || data.hero || {},
-      features: siteConfig.features || [],
-      about: siteConfig.about || {},
-      contact: siteConfig.contact || data.contact || {},
-      consult: siteConfig.consult || data.consult || { wechat: { enabled: false, qrImage: '' }, qq: { enabled: false, qrImage: '' } },
-      sections: siteConfig.sections || {}
-    };
-  };
-
-  const config = getConfig();
-
-  const updateConfig = (key: string, value: any) => {
-    const nd = { ...data };
-    if (!nd.siteConfig) nd.siteConfig = {};
-    nd.siteConfig[key] = value;
-    // 保持向后兼容
-    if (key === 'hero') nd.hero = value;
-    if (key === 'contact') nd.contact = value;
-    if (key === 'consult') nd.consult = value;
-    handleSave(nd);
-  };
-
-  const subTabs = [
-    { id: 'hero', label: '首页首屏', icon: Monitor },
-    { id: 'features', label: '特色功能', icon: Star },
-    { id: 'about', label: '关于我们', icon: Users },
-    { id: 'contact', label: '联系方式', icon: Phone },
-    { id: 'sections', label: '区块标题', icon: LayoutGrid },
-  ];
-
-  return (
-    <div>
-      {/* 子选项卡 */}
-      <div className="flex gap-1 mb-6 border-b border-slate-200">
-        {subTabs.map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveSubTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px ${
-              activeSubTab === tab.id
-                ? 'border-[#2B4A7A] text-[#2B4A7A]'
-                : 'border-transparent text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            <tab.icon size={14} />
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* 子选项卡内容 */}
-      {activeSubTab === 'hero' && (
-        <HeroSectionEditor config={config.hero} updateConfig={updateConfig} handleFileUpload={handleFileUpload} />
-      )}
-      {activeSubTab === 'features' && (
-        <FeaturesSectionEditor config={config.features} updateConfig={updateConfig} />
-      )}
-      {activeSubTab === 'about' && (
-        <AboutSectionEditor config={config.about} updateConfig={updateConfig} handleFileUpload={handleFileUpload} />
-      )}
-      {activeSubTab === 'contact' && (
-        <ContactSectionEditor config={config.contact} consult={config.consult} updateConfig={updateConfig} handleFileUpload={handleFileUpload} />
-      )}
-      {activeSubTab === 'sections' && (
-        <SectionsSectionEditor config={config.sections} updateConfig={updateConfig} data={data} />
-      )}
-    </div>
-  );
-}
-
-/* ==================== 首页首屏编辑器 ==================== */
-function HeroSectionEditor({ config, updateConfig, handleFileUpload }: any) {
-  const [extracting, setExtracting] = useState(false);
-  const hero = config || {};
-
-  return (
-    <div className="space-y-6">
-      <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-        <Monitor size={15} className="text-blue-500" />首页首屏多媒体
-      </h3>
-      <div className="bg-slate-50 p-6 rounded-xl border space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">背景视频 (MP4)</label>
-          <div className="flex gap-3 items-center">
-            <input
-              className="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
-              value={hero.videoUrl || ''}
-              onChange={e => updateConfig('hero', { ...hero, videoUrl: e.target.value })}
-              placeholder="例如: /uploads/videos/hero-video.mp4 或是外部链接"
-            />
-            <button
-              type="button"
-              onClick={() => document.getElementById('hero-video-upload')?.click()}
-              disabled={extracting}
-              className={`bg-white border border-slate-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 flex items-center gap-2 transition-colors ${extracting ? 'opacity-70 cursor-not-allowed' : ''}`}
-            >
-              {extracting ? <RotateCcw size={16} className="text-blue-500 animate-spin" /> : <Upload size={16} className="text-slate-500" />}
-              {extracting ? '上传及处理中...' : '上传视频'}
-            </button>
-            <input
-              id="hero-video-upload"
-              type="file"
-              className="hidden"
-              accept="video/*"
-              disabled={extracting}
-              onChange={async e => {
-                const f = e.target.files?.[0];
-                console.log('Selected file:', f?.name, 'size:', f?.size);
-                if (f) {
-                  setExtracting(true);
-                  try {
-                    console.log('Uploading video...');
-                    const url = await handleFileUpload(f, 'videos');
-                    console.log('Upload result:', url);
-                    if (!url) {
-                      alert('视频上传失败，请检查网络连接');
-                      setExtracting(false);
-                      return;
-                    }
-                    const updatedHero = { ...hero, videoUrl: url };
-
-                    console.log('Extracting video frame...');
-                    const frameFile = await new Promise<File | null>((resolve) => {
-                      const video = document.createElement('video');
-                      const objUrl = URL.createObjectURL(f);
-                      video.src = objUrl;
-                      video.muted = true;
-                      video.playsInline = true;
-                      video.onloadeddata = () => {
-                        console.log('Video loaded, duration:', video.duration);
-                        video.currentTime = Math.min(0.5, video.duration / 2 || 0.5);
-                      };
-                      video.onseeked = () => {
-                        console.log('Seeked to:', video.currentTime, 'width:', video.videoWidth, 'height:', video.videoHeight);
-                        const canvas = document.createElement('canvas');
-                        canvas.width = video.videoWidth || 1920;
-                        canvas.height = video.videoHeight || 1080;
-                        const ctx = canvas.getContext('2d');
-                        ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
-                        canvas.toBlob((blob) => {
-                          if (blob) resolve(new File([blob], f.name.replace(/\.[^/.]+$/, "") + "_poster.jpg", { type: 'image/jpeg' }));
-                          else resolve(null);
-                          URL.revokeObjectURL(objUrl);
-                        }, 'image/jpeg', 0.8);
-                      };
-                      video.onerror = () => { URL.revokeObjectURL(objUrl); resolve(null); };
-                    });
-
-                    if (frameFile) {
-                      console.log('Uploading poster...');
-                      const posterUrl = await handleFileUpload(frameFile, 'hero');
-                      console.log('Poster upload result:', posterUrl);
-                      if (posterUrl) updatedHero.poster = posterUrl;
-                    }
-                    updateConfig('hero', updatedHero);
-                  } catch (err) { console.error("上传或截图失败", err); alert('处理失败: ' + err); }
-                  finally { setExtracting(false); }
-                }
-              }}
-            />
-          </div>
-          <p className="text-xs text-slate-500 mt-2">推荐尺寸 1920x1080，大小不要超过 20MB。上传后将自动提取第0.5秒作为海报封面。</p>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">封面图片 (海报/备用图)</label>
-          <div className="flex gap-4">
-            <div className="w-48 h-28 bg-white border border-slate-200 rounded-lg overflow-hidden relative group">
-              {hero.poster ? (
-                <img src={hero.poster} className="w-full h-full object-cover" alt="Hero Poster" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-100">无图片</div>
-              )}
-              <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white cursor-pointer">
-                <Upload size={20} className="mb-1" />
-                <span className="text-[10px]">上传图片</span>
-                <input type="file" className="hidden" accept="image/*" onChange={async e => {
-                  const f = e.target.files?.[0];
-                  if (f) {
-                    const url = await handleFileUpload(f, 'hero');
-                    if (url) updateConfig('hero', { ...hero, poster: url });
-                  }
-                }} />
-              </label>
-            </div>
-            <div className="flex-1 flex flex-col justify-center space-y-2">
-              <input
-                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
-                value={hero.poster || ''}
-                onChange={e => updateConfig('hero', { ...hero, poster: e.target.value })}
-                placeholder="图片链接"
-              />
-              <p className="text-xs text-slate-500">此图片用作视频加载前的海报图。上传视频时已自动生成，你也可以单独上传覆盖该图。</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ==================== 特色功能编辑器 ==================== */
-function FeaturesSectionEditor({ config, updateConfig }: any) {
-  const features = config || [];
-
-  const addFeature = () => {
-    const newFeatures = [...features, { icon: 'Star', title: '新特性', titleEn: 'New Feature', desc: '描述内容', descEn: 'Description' }];
-    updateConfig('features', newFeatures);
-  };
-
-  const updateFeature = (index: number, field: string, value: string) => {
-    const newFeatures = [...features];
-    newFeatures[index] = { ...newFeatures[index], [field]: value };
-    updateConfig('features', newFeatures);
-  };
-
-  const removeFeature = (index: number) => {
-    if (confirm('确定删除此特性?')) {
-      const newFeatures = features.filter((_: any, i: number) => i !== index);
-      updateConfig('features', newFeatures);
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-          <Star size={15} className="text-yellow-500" />特色功能列表
-        </h3>
-        <button onClick={addFeature} className="bg-[#2B4A7A] text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5">
-          <Plus size={15} /> 添加特性
-        </button>
-      </div>
-
-      {features.length === 0 ? (
-        <div className="text-center py-12 text-slate-400 bg-slate-50 rounded-xl">
-          暂无特性配置，点击"添加特性"开始配置
-        </div>
-      ) : (
-        <div className="grid gap-4">
-          {features.map((feature: any, i: number) => (
-            <div key={i} className="bg-slate-50 p-4 rounded-xl border relative group">
-              <button
-                onClick={() => removeFeature(i)}
-                className="absolute top-3 right-3 p-1.5 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <Trash2 size={14} />
-              </button>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <IconPicker
-                    value={feature.icon || 'Star'}
-                    onChange={icon => updateFeature(i, 'icon', icon)}
-                  />
-                </div>
-                <div></div>
-                <div>
-                  <label className="block text-xs text-slate-400 mb-1">中文标题</label>
-                  <input
-                    className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
-                    value={feature.title || ''}
-                    onChange={e => updateFeature(i, 'title', e.target.value)}
-                    placeholder="特性标题"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-slate-400 mb-1">English Title</label>
-                  <input
-                    className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
-                    value={feature.titleEn || ''}
-                    onChange={e => updateFeature(i, 'titleEn', e.target.value)}
-                    placeholder="Feature Title"
-                  />
-                </div>
-                <div className="col-span-2">
-                  <label className="block text-xs text-slate-400 mb-1">中文描述</label>
-                  <textarea
-                    className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
-                    rows={2}
-                    value={feature.desc || ''}
-                    onChange={e => updateFeature(i, 'desc', e.target.value)}
-                    placeholder="特性描述内容"
-                  />
-                </div>
-                <div className="col-span-2">
-                  <label className="block text-xs text-slate-400 mb-1">Description (EN)</label>
-                  <textarea
-                    className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
-                    rows={2}
-                    value={feature.descEn || ''}
-                    onChange={e => updateFeature(i, 'descEn', e.target.value)}
-                    placeholder="Feature description"
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ==================== 关于我们编辑器 ==================== */
-function AboutSectionEditor({ config, updateConfig, handleFileUpload }: any) {
-  const about = config || {};
-
-  const updateAbout = (field: string, value: any) => {
-    updateConfig('about', { ...about, [field]: value });
-  };
-
-  return (
-    <div className="space-y-6">
-      <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-        <Users size={15} className="text-green-500" />关于我们
-      </h3>
-      <div className="bg-slate-50 p-6 rounded-xl border space-y-6">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">标题 (中文)</label>
-            <input
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
-              value={about.title || ''}
-              onChange={e => updateAbout('title', e.target.value)}
-              placeholder="关于标题"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Title (English)</label>
-            <input
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
-              value={about.titleEn || ''}
-              onChange={e => updateAbout('titleEn', e.target.value)}
-              placeholder="About Title"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">简介描述 (中文)</label>
-          <textarea
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
-            rows={4}
-            value={about.description || ''}
-            onChange={e => updateAbout('description', e.target.value)}
-            placeholder="公司简介描述内容..."
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">Description (EN)</label>
-          <textarea
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
-            rows={4}
-            value={about.descriptionEn || ''}
-            onChange={e => updateAbout('descriptionEn', e.target.value)}
-            placeholder="Company introduction..."
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">展示图片</label>
-          <div className="flex gap-4">
-            <div className="w-48 h-32 bg-white border border-slate-200 rounded-lg overflow-hidden relative group">
-              {about.image ? (
-                <img src={about.image} className="w-full h-full object-cover" alt="About" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-100">无图片</div>
-              )}
-              <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white cursor-pointer">
-                <Upload size={20} className="mb-1" />
-                <span className="text-[10px]">上传图片</span>
-                <input type="file" className="hidden" accept="image/*" onChange={async e => {
-                  const f = e.target.files?.[0];
-                  if (f) {
-                    const url = await handleFileUpload(f, 'about');
-                    if (url) updateAbout('image', url);
-                  }
-                }} />
-              </label>
-            </div>
-            <div className="flex-1">
-              <input
-                className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
-                value={about.image || ''}
-                onChange={e => updateAbout('image', e.target.value)}
-                placeholder="图片链接"
-              />
-              <p className="text-xs text-slate-500 mt-2">建议尺寸 800x600px 或 16:9 比例</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ==================== 联系方式编辑器 ==================== */
-function ContactSectionEditor({ config, consult, updateConfig, handleFileUpload }: any) {
-  const contact = config || {};
-  const consultData = consult || { wechat: { enabled: false, qrImage: '' }, qq: { enabled: false, qrImage: '' } };
-
-  const updateContact = (field: string, value: string) => {
-    updateConfig('contact', { ...contact, [field]: value });
-  };
-
-  const updateConsult = (field: string, value: any) => {
-    updateConfig('consult', { ...consultData, [field]: value });
-  };
-
-  const updateConsultItem = (type: string, field: string, value: any) => {
-    updateConfig('consult', { ...consultData, [type]: { ...consultData[type], [field]: value } });
-  };
-
-  return (
-    <div className="grid md:grid-cols-2 gap-10">
-      <div>
-        <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
-          <Phone size={15} className="text-blue-500" />基础联系方式
-        </h3>
-        <div className="space-y-3">
-          {[
-            { key: 'phone', label: '固话' },
-            { key: 'mobile', label: '手机' },
-            { key: 'email', label: '邮箱' },
-            { key: 'address', label: '地址' },
-            { key: 'addressEn', label: 'Address (EN)' },
-          ].map(({ key, label }) => (
-            <div key={key}>
-              <label className="block text-xs text-slate-400 mb-1">{label}</label>
-              <input
-                className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none"
-                value={contact[key] || ''}
-                onChange={e => updateContact(key, e.target.value)}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-      <div>
-        <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
-          <Globe size={15} className="text-emerald-500" />在线咨询 (扫码)
-        </h3>
-        <div className="space-y-4 p-4 bg-slate-50 rounded-xl border">
-          <div>
-            <label className="block text-xs text-slate-400 mb-1">标题</label>
-            <input className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none" value={consultData.title || ''} onChange={e => updateConsult('title', e.target.value)} />
-          </div>
-          <div>
-            <label className="block text-xs text-slate-400 mb-1">描述</label>
-            <textarea className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none" rows={2} value={consultData.description || ''} onChange={e => updateConsult('description', e.target.value)} />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            {['wechat', 'qq'].map(type => (
-              <div key={type} className="bg-white p-3 rounded-lg border">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold uppercase text-slate-600">{type}</span>
-                  <input type="checkbox" checked={consultData[type]?.enabled ?? false} onChange={e => updateConsultItem(type, 'enabled', e.target.checked)} />
-                </div>
-                <div className="aspect-square bg-slate-50 rounded-lg relative overflow-hidden">
-                  {consultData[type]?.qrImage ? <img src={consultData[type].qrImage} className="w-full h-full object-contain" alt="" /> : <div className="w-full h-full flex items-center justify-center text-slate-300 text-xs">暂无二维码</div>}
-                  <label className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity">
-                    <Upload className="text-white" size={18} />
-                    <input type="file" className="hidden" accept="image/*" onChange={async e => {
-                      const f = e.target.files?.[0];
-                      if (f) {
-                        const url = await handleFileUpload(f, 'others');
-                        if (url) updateConsultItem(type, 'qrImage', url);
-                      }
-                    }} />
-                  </label>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ==================== 区块标题编辑器 ==================== */
-function SectionsSectionEditor({ config, updateConfig, data }: any) {
-  const sections = config || {};
-
-  const sectionFields = [
-    { key: 'products', label: '产品中心', labelEn: 'Products', dataKey: 'products' },
-    { key: 'solutions', label: '解决方案', labelEn: 'Solutions', dataKey: 'solutionVideos' },
-    { key: 'customization', label: '定制服务', labelEn: 'Customization', dataKey: 'products' },
-    { key: 'album', label: '企业相册', labelEn: 'Album', dataKey: 'companyAlbum' },
-  ];
-
-  const updateSection = (key: string, field: string, value: string) => {
-    updateConfig('sections', { ...sections, [key]: { ...sections[key], [field]: value } });
-  };
-
-  return (
-    <div className="space-y-6">
-      <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-        <LayoutGrid size={15} className="text-purple-500" />各区块标题配置
-      </h3>
-      <div className="grid gap-4">
-        {sectionFields.map(({ key, label, labelEn }) => (
-          <div key={key} className="bg-slate-50 p-4 rounded-xl border">
-            <h4 className="text-sm font-semibold text-slate-700 mb-3">{label}</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs text-slate-400 mb-1">区块标题</label>
-                <input
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
-                  value={sections[key]?.title || ''}
-                  onChange={e => updateSection(key, 'title', e.target.value)}
-                  placeholder={`${label}标题`}
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-slate-400 mb-1">Section Title (EN)</label>
-                <input
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
-                  value={sections[key]?.titleEn || ''}
-                  onChange={e => updateSection(key, 'titleEn', e.target.value)}
-                  placeholder={`${labelEn} Title`}
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-slate-400 mb-1">副标题</label>
-                <input
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
-                  value={sections[key]?.subtitle || ''}
-                  onChange={e => updateSection(key, 'subtitle', e.target.value)}
-                  placeholder="副标题内容"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-slate-400 mb-1">Subtitle (EN)</label>
-                <input
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
-                  value={sections[key]?.subtitleEn || ''}
-                  onChange={e => updateSection(key, 'subtitleEn', e.target.value)}
-                  placeholder="Subtitle content"
-                />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ==================== 图标选择器 ==================== */
-const ICON_LIST = [
-  { name: 'Star', icon: Star },
-  { name: 'Zap', icon: Zap },
-  { name: 'Shield', icon: Shield },
-  { name: 'Target', icon: Target },
-  { name: 'Wifi', icon: Wifi },
-  { name: 'Cpu', icon: Cpu },
-  { name: 'Server', icon: Server },
-  { name: 'Database', icon: Database },
-  { name: 'Lock', icon: Lock },
-  { name: 'Unlock', icon: Unlock },
-  { name: 'Eye', icon: Eye },
-  { name: 'Fingerprint', icon: Fingerprint },
-  { name: 'Activity', icon: Activity },
-  { name: 'Box', icon: Box },
-  { name: 'Truck', icon: Truck },
-  { name: 'Factory', icon: Factory },
-  { name: 'Cog', icon: Cog },
-  { name: 'Gauge', icon: Gauge },
-  { name: 'Thermometer', icon: Thermometer },
-  { name: 'Signal', icon: Signal },
-  { name: 'Battery', icon: Battery },
-  { name: 'Cloud', icon: Cloud },
-  { name: 'HardDrive', icon: HardDrive },
-  { name: 'Laptop', icon: Laptop },
-  { name: 'Smartphone', icon: Smartphone },
-  { name: 'Camera', icon: Camera },
-  { name: 'Video', icon: Video },
-  { name: 'Volume2', icon: Volume2 },
-  { name: 'Mail', icon: Mail },
-  { name: 'MessageSquare', icon: MessageSquare },
-  { name: 'PhoneCall', icon: PhoneCall },
-  { name: 'MapPin', icon: MapPin },
-  { name: 'User', icon: User },
-  { name: 'Users', icon: Users2 },
-  { name: 'Award', icon: Award },
-  { name: 'Medal', icon: Medal },
-  { name: 'TrendingUp', icon: TrendingUp },
-  { name: 'BarChart', icon: BarChart2 },
-  { name: 'RefreshCw', icon: RefreshCw },
-  { name: 'CheckCircle', icon: CheckCircle },
-  { name: 'AlertCircle', icon: AlertCircle },
-  { name: 'Info', icon: Info },
-  { name: 'HelpCircle', icon: HelpCircle },
-  { name: 'Lightbulb', icon: Lightbulb },
-  { name: 'Rocket', icon: Rocket },
-  { name: 'Globe', icon: Globe },
-  { name: 'Compass', icon: Compass },
-  { name: 'Car', icon: Car },
-  { name: 'Home', icon: Home },
-  { name: 'Building', icon: Building },
-  { name: 'ShoppingCart', icon: ShoppingCart },
-  { name: 'Tag', icon: Tag },
-  { name: 'Heart', icon: Heart },
-  { name: 'ThumbsUp', icon: ThumbsUp },
-  { name: 'Share2', icon: Share2 },
-  { name: 'Gift', icon: Gift },
-  { name: 'File', icon: File },
-  { name: 'FileText', icon: FileText },
-  { name: 'Grid', icon: Grid },
-  { name: 'Layout', icon: Layout },
-  { name: 'Maximize', icon: Maximize2 },
-  { name: 'ZoomIn', icon: ZoomIn },
-  { name: 'Edit', icon: Edit2 },
-  { name: 'Settings', icon: Settings },
-];
-
-function IconPicker({ value, onChange }: { value: string; onChange: (icon: string) => void }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [search, setSearch] = useState('');
-
-  const filteredIcons = ICON_LIST.filter(i =>
-    i.name.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const selectedIcon = ICON_LIST.find(i => i.name === value);
-
-  return (
-    <div className="relative">
-      <label className="block text-xs text-slate-400 mb-1">选择图标</label>
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none flex items-center gap-2 bg-white hover:bg-slate-50"
-      >
-        {selectedIcon ? (
-          <>
-            <selectedIcon.icon size={18} className="text-[#2B4A7A]" />
-            <span>{value}</span>
-          </>
-        ) : (
-          <span className="text-slate-400">点击选择图标</span>
-        )}
-      </button>
-
-      {isOpen && (
-        <div className="absolute z-50 mt-1 w-80 bg-white border rounded-xl shadow-lg max-h-64 flex flex-col">
-          <div className="p-2 border-b">
-            <input
-              type="text"
-              placeholder="搜索图标..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              autoFocus
-            />
-          </div>
-          <div className="flex-1 overflow-y-auto p-2">
-            <div className="grid grid-cols-6 gap-1">
-              {filteredIcons.map(item => (
-                <button
-                  key={item.name}
-                  type="button"
-                  onClick={() => {
-                    onChange(item.name);
-                    setIsOpen(false);
-                    setSearch('');
-                  }}
-                  className={`p-2 rounded-lg hover:bg-slate-100 flex items-center justify-center ${
-                    value === item.name ? 'bg-blue-50 ring-1 ring-blue-400' : ''
-                  }`}
-                  title={item.name}
-                >
-                  <item.icon size={18} className="text-slate-600" />
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ exists: false, count: 0 });
   }
 
-  const dirPath = path.join(process.cwd(), 'public', '360', code);
+  const dirPath = path.join(process.cwd(), 'public', 'uploads', code, '360');
 
   try {
     if (fs.existsSync(dirPath)) {
