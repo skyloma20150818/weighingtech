@@ -108,7 +108,7 @@ model VideoItem {
 
 model SiteConfig {
   id       Int      @id @default(1)
-  hero     Json?    // { badge, title1, title2, title3, subtitle, videoUrl, poster }
+  hero     Json?    // { badge, title1, title2, title3, subtitle, videoUrl, poster, backgroundImage }
   features Json?    // [ { icon, title, desc, titleEn, descEn } ]
   about    Json?    // { description, intro, factoryLabel, features: [] }
   contact  Json?    // { phone, mobile, email, address }

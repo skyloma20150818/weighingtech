@@ -62,24 +62,22 @@ export default function Header({ lang, onLangChange, phone }: HeaderProps) {
   };
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    <nav className={`sticky top-0 z-50 transition-all duration-300 ${
       isScrolled 
-        ? 'bg-white/80 backdrop-blur-lg shadow-lg' 
-        : 'bg-white/10 backdrop-blur-md'
+        ? 'bg-white/95 backdrop-blur-md shadow-lg' 
+        : 'bg-white shadow-sm'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <Link href="/" className="flex items-center">
-            <div className={`transition-all duration-300 ${isScrolled ? '' : 'brightness-0 invert'}`}>
-              <SmartImage 
-                src="/logo.png" 
-                alt="唯英科技 Logo" 
-                width={160}
-                height={48}
-                className="h-12 w-auto object-contain" 
-                priority
-              />
-            </div>
+            <SmartImage 
+              src="/logo.png" 
+              alt="唯英科技 Logo" 
+              width={160}
+              height={48}
+              className="h-12 w-auto object-contain" 
+              priority
+            />
           </Link>
 
           <div className="hidden md:flex space-x-8">
@@ -88,14 +86,10 @@ export default function Header({ lang, onLangChange, phone }: HeaderProps) {
                 key={item.id}
                 href={item.href}
                 onClick={(e) => isHomePage && scrollToSection(e, item.id, item.href)}
-                className={`relative font-medium transition-colors duration-300 py-2 group ${
-                  isScrolled ? 'text-slate-600 hover:text-[#2B4A7A]' : 'text-white/90 hover:text-white'
-                }`}
+                className="relative font-medium transition-colors duration-300 py-2 text-slate-600 hover:text-[#2B4A7A] group"
               >
                 {item.label}
-                <span className={`absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full ${
-                  isScrolled ? 'bg-[#2B4A7A]' : 'bg-white'
-                }`} />
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#2B4A7A] transition-all duration-300 group-hover:w-full" />
               </a>
             ))}
           </div>

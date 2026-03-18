@@ -220,29 +220,59 @@ export default function HomeClient({ initialData }: HomeClientProps) {
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800">
       {/* Hero Section */}
-      <section id="home" className="relative bg-white overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-white/20 z-0"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 relative z-10">
+      <section id="home" className="relative min-h-screen flex items-center overflow-hidden">
+        {/* 背景图片 */}
+        {hero?.backgroundImage && (
+          <div className="absolute inset-0 z-0">
+            <img
+              src={hero.backgroundImage}
+              alt="Hero Background"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-900/70 via-slate-900/50 to-blue-900/70"></div>
+          </div>
+        )}
+        {/* 默认渐变背景（无背景图时） */}
+        {!hero?.backgroundImage && (
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-white/20 z-0"></div>
+        )}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 relative z-10 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 bg-blue-50 text-[#2B4A7A] px-4 py-2 rounded-full text-sm font-medium border border-blue-100">
+              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border ${
+                hero?.backgroundImage 
+                  ? 'bg-white/20 text-white border-white/30 backdrop-blur-sm' 
+                  : 'bg-blue-50 text-[#2B4A7A] border-blue-100'
+              }`}>
                 <CheckCircle size={16} />
                 <span>{lang === 'zh' ? (hero?.badge || t.hero.badge) : (hero?.badgeEn || t.hero.badge || t.hero.badge)}</span>
               </div>
-              <h1 className="text-5xl lg:text-6xl font-bold leading-tight text-slate-900">
+              <h1 className={`text-5xl lg:text-6xl font-bold leading-tight ${
+                hero?.backgroundImage ? 'text-white' : 'text-slate-900'
+              }`}>
                 {lang === 'zh' ? (hero?.title1 || t.hero.title1) : (hero?.title1En || t.hero.title1)}<br />
-                <span className="text-[#2B4A7A]">{lang === 'zh' ? (hero?.title2 || t.hero.title2) : (hero?.title2En || t.hero.title2)}</span>
+                <span className={hero?.backgroundImage ? 'text-blue-300' : 'text-[#2B4A7A]'}>{lang === 'zh' ? (hero?.title2 || t.hero.title2) : (hero?.title2En || t.hero.title2)}</span>
                 {lang === 'zh' ? (hero?.title3 || t.hero.title3) : (hero?.title3En || t.hero.title3)}
               </h1>
-              <p className="text-lg text-slate-600 max-w-lg leading-relaxed">
+              <p className={`text-lg max-w-lg leading-relaxed ${
+                hero?.backgroundImage ? 'text-white/90' : 'text-slate-600'
+              }`}>
                 {lang === 'zh' ? (hero?.subtitle || t.hero.subtitle) : (hero?.subtitleEn || t.hero.subtitle)}
               </p>
               <div className="flex flex-wrap gap-4">
-                <a href="#products" className="bg-[#2B4A7A] text-white px-8 py-3.5 rounded-xl hover:bg-[#1C3359] transition-all duration-300 font-medium flex items-center gap-2 shadow-lg shadow-blue-900/20 hover:-translate-y-0.5">
+                <a href="#products" className={`px-8 py-3.5 rounded-xl transition-all duration-300 font-medium flex items-center gap-2 shadow-lg hover:-translate-y-0.5 ${
+                  hero?.backgroundImage 
+                    ? 'bg-white text-[#2B4A7A] hover:bg-blue-50 shadow-white/20' 
+                    : 'bg-[#2B4A7A] text-white hover:bg-[#1C3359] shadow-blue-900/20'
+                }`}>
                   {hero?.productsLabel || t.hero.products} <ArrowUpRight size={18} />
                 </a>
-                <a href="#contact" className="bg-white text-slate-700 border border-slate-200 px-8 py-3.5 rounded-xl hover:bg-slate-50 transition-all duration-300 font-medium hover:-translate-y-0.5">
+                <a href="#contact" className={`px-8 py-3.5 rounded-xl transition-all duration-300 font-medium hover:-translate-y-0.5 ${
+                  hero?.backgroundImage 
+                    ? 'bg-white/10 text-white border border-white/30 backdrop-blur-sm hover:bg-white/20' 
+                    : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                }`}>
                   {hero?.contactLabel || t.hero.contact}
                 </a>
               </div>
