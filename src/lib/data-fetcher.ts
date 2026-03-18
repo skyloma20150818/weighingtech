@@ -88,7 +88,7 @@ export const getSiteConfig = unstable_cache(
     };
   },
   ['site-config'],
-  { tags: ['site-config'], revalidate: 0 } // 禁用缓存
+  { tags: ['site-config'], revalidate: false } // 禁用缓存
 );
 
 export const getContact = async () => {

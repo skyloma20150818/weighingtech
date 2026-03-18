@@ -64,7 +64,7 @@ export default function ProductDetail({ product, consult, recommendations }: Pro
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-blue-100">
+    <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-blue-100 pt-20">
       <main className="max-w-7xl mx-auto px-6 py-12 lg:py-16">
         
         {/* Breadcrumb */}

@@ -219,8 +219,8 @@ export default function HomeClient({ initialData }: HomeClientProps) {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800">
-      {/* Hero Section */}
-      <section id="home" className="relative min-h-screen flex items-center overflow-hidden">
+      {/* Hero Section - 沉浸式背景，延伸到导航栏下方 */}
+      <section id="home" className="relative min-h-screen flex items-center overflow-hidden -mt-20 pt-20">
         {/* 背景图片 */}
         {hero?.backgroundImage && (
           <div className="absolute inset-0 z-0">
