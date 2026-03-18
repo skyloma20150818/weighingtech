@@ -280,7 +280,7 @@ export default function HomeClient({ initialData }: HomeClientProps) {
 
             {/* Right Image/Video */}
             <div
-              className="relative rounded-3xl overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.25),0_10px_20px_-5px_rgba(0,0,0,0.1)] group  bg-slate-100 aspect-video"
+              className="relative rounded-3xl overflow-hidden shadow-[0_25px_60px_-15px_rgba(255,255,255,0.3),0_10px_20px_-5px_rgba(255,255,255,0.2),0_8px_30px_rgba(0,0,0,0.15)] group bg-slate-50 aspect-video ring-1 ring-white/20"
             >
               {hero?.videoUrl ? (
                 <>
@@ -296,7 +296,6 @@ export default function HomeClient({ initialData }: HomeClientProps) {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      // 不全屏播放，只打开视频弹窗
                       setSelectedVideo(hero.videoUrl);
                     }}
                     onDoubleClick={(e) => {
@@ -310,12 +309,12 @@ export default function HomeClient({ initialData }: HomeClientProps) {
                       e.stopPropagation();
                       toggleMute();
                     }}
-                    className="absolute bottom-4 right-4 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors z-10"
+                    className="absolute bottom-4 right-4 p-2 bg-white/80 backdrop-blur-sm text-slate-700 hover:bg-white transition-colors z-10 rounded-full shadow-lg"
                     title={isMuted ? '开启声音' : '静音'}
                   >
                     {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
                   </button>
-                  <div className="absolute inset-0 bg-slate-900/10 transition-colors"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
                 </>
               ) : (
                 <>
@@ -326,10 +325,9 @@ export default function HomeClient({ initialData }: HomeClientProps) {
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                     priority
                   />
-                  <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-slate-900/30 transition-colors"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"></div>
                 </>
               )}
-
             </div>
           </div>
         </div>
@@ -354,9 +352,9 @@ export default function HomeClient({ initialData }: HomeClientProps) {
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${activeCategory === cat.id
-                  ? 'bg-[#2B4A7A] text-white shadow-md shadow-blue-900/20'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                className={`whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 ${activeCategory === cat.id
+                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 scale-105'
+                  : 'bg-white text-slate-600 hover:bg-blue-50 hover:text-blue-600 border border-slate-200'
                   }`}
               >
                 {lang === 'en' ? cat.nameEn : cat.name}
@@ -420,10 +418,10 @@ export default function HomeClient({ initialData }: HomeClientProps) {
               <button
                 key={cat.id}
                 onClick={() => setActiveSolutionCategory(cat.id)}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${activeSolutionCategory === cat.id
-                  ? 'bg-[#2B4A7A] text-white shadow-md shadow-blue-900/20 scale-105'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
-                  }`}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 ${activeSolutionCategory === cat.id
+                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 scale-105'
+                  : 'bg-white text-slate-600 hover:bg-blue-50 hover:text-blue-600 border border-slate-200'
+                }`}
               >
                 {lang === 'en' ? cat.nameEn : cat.name}
               </button>
@@ -556,10 +554,10 @@ export default function HomeClient({ initialData }: HomeClientProps) {
               <button
                 key={cat.id}
                 onClick={() => setActiveAlbumCategory(cat.id)}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${activeAlbumCategory === cat.id
-                  ? 'bg-[#2B4A7A] text-white shadow-md shadow-blue-900/20 scale-105'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
-                  }`}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 ${activeAlbumCategory === cat.id
+                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 scale-105'
+                  : 'bg-white text-slate-600 hover:bg-blue-50 hover:text-blue-600 border border-slate-200'
+                }`}
               >
                 {lang === 'en' ? cat.nameEn : cat.name}
               </button>

@@ -20,19 +20,19 @@ body {
   --card-foreground: oklch(0.1371 0.0360 258.5258);
   --popover: oklch(1.0000 0 0);
   --popover-foreground: oklch(0.1371 0.0360 258.5258);
-  --primary: oklch(0.5460 0.2153 262.8719);
-  --primary-foreground: oklch(0.9838 0.0035 247.8583);
+  --primary: oklch(0.6232 0.1879 259.7964); /* 更明亮的蓝色 */
+  --primary-foreground: oklch(1.0000 0 0);
   --secondary: oklch(0.9684 0.0068 247.8951);
   --secondary-foreground: oklch(0.2079 0.0399 265.7275);
   --muted: oklch(0.9684 0.0068 247.8951);
   --muted-foreground: oklch(0.5547 0.0407 257.4404);
-  --accent: oklch(0.9684 0.0068 247.8951);
+  --accent: oklch(0.9300 0.0300 260.0000); /* 更温暖的蓝色 */
   --accent-foreground: oklch(0.2079 0.0399 265.7275);
   --destructive: oklch(0.6368 0.2078 25.3259);
   --destructive-foreground: oklch(0.9838 0.0035 247.8583);
   --border: oklch(0.9290 0.0126 255.5317);
   --input: oklch(0.9290 0.0126 255.5317);
-  --ring: oklch(0.5460 0.2153 262.8719);
+  --ring: oklch(0.6232 0.1879 259.7964);
   --chart-1: oklch(0.5460 0.2153 262.8719);
   --chart-2: oklch(0.7211 0.1415 253.1015);
   --chart-3: oklch(0.6325 0.1843 258.6360);
