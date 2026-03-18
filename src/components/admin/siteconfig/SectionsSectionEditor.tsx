@@ -15,7 +15,7 @@ export function SectionsSectionEditor({ config, updateConfig }: SectionsSectionE
   const sectionFields = [
     { key: 'products', label: '产品中心', labelEn: 'Products' },
     { key: 'solutions', label: '解决方案', labelEn: 'Solutions' },
-    { key: 'customization', label: '定制服务', labelEn: 'Customization' },
+    { key: 'customization', label: '服务和支持', labelEn: 'Customization' },
     { key: 'album', label: '企业相册', labelEn: 'Album' },
   ];
 

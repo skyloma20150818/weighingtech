@@ -8,10 +8,102 @@ import {
   Volume2, VolumeX, Video
 } from 'lucide-react';
 import Product360Viewer from '../components/Product360Viewer';
+import SmartImage from '../components/SmartImage';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Language, translations } from '../i18n';
-import type { Category, VideoItem, AlbumItem, Product, Contact, Consult, About, Hero, Feature } from '../data';
+// 类型定义（从 data.ts 迁移过来）
+interface Category {
+  id: string;
+  name: string;
+  nameEn: string;
+}
+
+interface VideoItem {
+  id: string;
+  title: string;
+  titleEn?: string;
+  category: string;
+  thumbnail: string;
+  videoUrl: string;
+}
+
+interface AlbumItem {
+  id: string;
+  title: string;
+  titleEn?: string;
+  category: string;
+  image: string;
+}
+
+interface Product {
+  id: string;
+  code: string;
+  name: string;
+  nameEn?: string;
+  category: string;
+  description: string;
+  descriptionEn?: string;
+  image: string;
+  has360?: boolean;
+  images360Count?: number;
+  introImages?: string[];
+  specs?: { label: string; labelEn: string; value: string }[];
+  documents?: any[];
+  manualUrl?: string;
+}
+
+interface Contact {
+  phone?: string;
+  mobile?: string;
+  email?: string;
+  address?: string;
+}
+
+interface Consult {
+  title?: string;
+  description?: string;
+  wechat?: { enabled?: boolean; label?: string; qrImage?: string };
+  qq?: { enabled?: boolean; number?: string; label?: string; qrImage?: string };
+}
+
+interface About {
+  title?: string;
+  titleEn?: string;
+  subtitle?: string;
+  subtitleEn?: string;
+  description?: string;
+  descriptionEn?: string;
+  image?: string;
+}
+
+interface Hero {
+  badge?: string;
+  badgeEn?: string;
+  title1?: string;
+  title1En?: string;
+  title2?: string;
+  title2En?: string;
+  title3?: string;
+  title3En?: string;
+  subtitle?: string;
+  subtitleEn?: string;
+  productsLabel?: string;
+  productsLabelEn?: string;
+  contactLabel?: string;
+  contactLabelEn?: string;
+  videoUrl?: string;
+  poster?: string;
+  backgroundImage?: string; // Hero 背景图片
+}
+
+interface Feature {
+  icon: string;
+  title: string;
+  titleEn?: string;
+  desc: string;
+  descEn?: string;
+}
 import { useLanguage } from './LanguageContext';
 
 interface HomeClientProps {
@@ -158,7 +250,7 @@ export default function HomeClient({ initialData }: HomeClientProps) {
 
             {/* Right Image/Video */}
             <div
-              className="relative rounded-3xl overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.25),0_10px_20px_-5px_rgba(0,0,0,0.1)] group border-4 border-white bg-slate-100 aspect-video"
+              className="relative rounded-3xl overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.25),0_10px_20px_-5px_rgba(0,0,0,0.1)] group  bg-slate-100 aspect-video"
             >
               {hero?.videoUrl ? (
                 <>
@@ -197,12 +289,11 @@ export default function HomeClient({ initialData }: HomeClientProps) {
                 </>
               ) : (
                 <>
-                  <Image
+                  <SmartImage
                     src={hero?.poster || "https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?auto=format&fit=crop&q=80&w=1200"}
                     alt="Industrial Weighing Scale"
-                    width={800}
-                    height={600}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
                     priority
                   />
                   <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-slate-900/30 transition-colors"></div>
@@ -245,9 +336,9 @@ export default function HomeClient({ initialData }: HomeClientProps) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredProducts.map((product) => (
-              <div 
-                key={product.id} 
-                className="bg-white rounded-2xl overflow-hidden group hover:shadow-[0_15px_40px_rgb(0,0,0,0.08)] transition-all duration-300 border border-slate-100 flex flex-col cursor-pointer"
+              <div
+                key={product.id}
+                className="bg-white rounded-2xl overflow-hidden group hover:shadow-[0_15px_40px_rgb(0,0,0,0.08)] transition-all duration-300 border border-slate-100 flex flex-col cursor-pointer hover:-translate-y-1"
                 onClick={() => router.push(`/product/${product.id}`)}
               >
                 <div className="relative h-48 overflow-hidden bg-white p-4">
@@ -257,6 +348,7 @@ export default function HomeClient({ initialData }: HomeClientProps) {
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                     className="object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500 p-4"
+                    loading="lazy"
                   />
 
                   {product.has360 && (
@@ -287,10 +379,8 @@ export default function HomeClient({ initialData }: HomeClientProps) {
       {/* Solutions Video Gallery */}
       <section id="solutions" className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-blue-50 text-[#2B4A7A] px-4 py-2 rounded-full text-sm font-medium mb-4 border border-blue-100">
-              <ShieldCheck size={16} /> {lang === 'zh' ? (sections?.solutions?.badge || t.sections.solutionsBadge) : (sections?.solutions?.badgeEn || t.sections.solutionsBadge)}
-            </div>
+          <div className="text-center mb-12">
+
             <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">{lang === 'zh' ? (sections?.solutions?.title || t.sections.solutions) : (sections?.solutions?.titleEn || t.sections.solutions)}</h2>
             <p className="text-slate-600 max-w-2xl mx-auto">{lang === 'zh' ? (sections?.solutions?.subtitle || t.sections.solutionsSub) : (sections?.solutions?.subtitleEn || t.sections.solutionsSub)}</p>
           </div>
@@ -319,12 +409,10 @@ export default function HomeClient({ initialData }: HomeClientProps) {
               >
                 <div className="relative h-48 overflow-hidden bg-slate-200">
                   {item.thumbnail ? (
-                    <Image
+                    <img
                       src={item.thumbnail}
                       alt={lang === 'en' && item.titleEn ? item.titleEn : item.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-400">
@@ -352,26 +440,18 @@ export default function HomeClient({ initialData }: HomeClientProps) {
         </div>
       </section>
 
-      {/* Customization Service */}
-      <section className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="https://images.unsplash.com/photo-1581092335397-9583eb92d232?auto=format&fit=crop&q=80&w=2000"
-            alt="Customization Background"
-            fill
-            className="object-cover opacity-40"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/95 via-white/95 to-slate-100/95 backdrop-blur-[2px]"></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      {/* 服务和支持 */}
+      <section id="support" className="py-24 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-white text-[#2B4A7A] px-4 py-2 rounded-full text-sm font-medium mb-6 border border-blue-100 shadow-sm">
-              <Settings size={16} /> {lang === 'zh' ? (sections?.customization?.badge || t.sections.customizationBadge) : (sections?.customization?.badgeEn || t.sections.customizationBadge)}
-            </div>
-            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-6">{lang === 'zh' ? (sections?.customization?.title || t.sections.customization) : (sections?.customization?.titleEn || t.sections.customization)}</h2>
+
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-6">
+              {lang === 'zh' ? '服务和支持' : 'Service & Support'}
+            </h2>
             <p className="text-slate-600 text-lg max-w-3xl mx-auto leading-relaxed">
-              {lang === 'zh' ? (sections?.customization?.subtitle || t.sections.customizationSub) : (sections?.customization?.subtitleEn || t.sections.customizationSub)}
+              {lang === 'zh'
+                ? '我们提供全方位的售前咨询、售中支持和售后服务，确保您的设备始终保持最佳状态'
+                : 'We provide comprehensive pre-sales consultation, sales support and after-sales service'}
             </p>
           </div>
 
@@ -425,8 +505,8 @@ export default function HomeClient({ initialData }: HomeClientProps) {
           </div>
 
           <div className="flex justify-center">
-            <a href="#contact" className="bg-[#2B4A7A] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#1C3359] transition-colors shadow-xl shadow-blue-900/20 inline-flex items-center gap-2">
-              <Wrench size={20} /> 提交定制需求，获取专属方案
+            <a href="#footer" className="bg-[#2B4A7A] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-[#1C3359] transition-colors shadow-xl shadow-blue-900/20 inline-flex items-center gap-2">
+              <Wrench size={20} /> {lang === 'zh' ? '联系我们获取服务' : 'Contact Us for Service'}
             </a>
           </div>
         </div>
@@ -436,9 +516,7 @@ export default function HomeClient({ initialData }: HomeClientProps) {
       <section id="album" className="bg-slate-50 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-blue-50 text-[#2B4A7A] px-4 py-2 rounded-full text-sm font-medium mb-4 border border-blue-100">
-              <ImageIcon size={16} /> {t.sections.albumBadge}
-            </div>
+
             <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">{t.sections.album}</h2>
             <p className="text-slate-600 max-w-2xl mx-auto">{t.sections.albumSub}</p>
           </div>
@@ -466,12 +544,13 @@ export default function HomeClient({ initialData }: HomeClientProps) {
                 onClick={() => setSelectedImage(item.image)}
               >
                 <div className="relative h-56 overflow-hidden">
-                  <Image
+                  <SmartImage
                     src={item.image}
                     alt={lang === 'en' && item.titleEn ? item.titleEn : item.title}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -494,26 +573,14 @@ export default function HomeClient({ initialData }: HomeClientProps) {
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="bg-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">{t.hero.contact}</h2>
-            <p className="text-slate-600">{t.footer.contactSub}</p>
-          </div>
-        </div>
-      </section>
-
       {/* About Section */}
       <section id="about" className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="relative">
-              <Image
-                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=1000"
+              <img
+                src={about?.image || "/uploads/about/cctv.mp4_20260318_213140722.jpg"}
                 alt="Modern Factory"
-                width={800}
-                height={500}
                 className="rounded-3xl shadow-lg w-full h-[500px] object-cover"
               />
               <div className="absolute -bottom-6 -right-6 lg:-right-10 bg-white p-8 rounded-3xl shadow-[0_20px_50px_rgb(0,0,0,0.1)] border border-slate-100">
@@ -558,24 +625,63 @@ export default function HomeClient({ initialData }: HomeClientProps) {
 
       {/* Modals */}
       {selectedImage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm" onClick={() => setSelectedImage(null)}>
-          <button className="absolute top-6 right-6 text-white/70 hover:text-white bg-white/10 p-2 rounded-full"><X size={24} /></button>
-          <div className="relative w-full h-full max-w-[90vw] max-h-[90vh]">
-            <Image 
-              src={selectedImage} 
-              alt="View" 
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+          onClick={() => setSelectedImage(null)}
+        >
+          <motion.button
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ delay: 0.1 }}
+            className="absolute top-6 right-6 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors"
+          >
+            <X size={24} />
+          </motion.button>
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            className="relative w-full h-full max-w-[90vw] max-h-[90vh]"
+          >
+            <SmartImage
+              src={selectedImage}
+              alt="View"
               fill
-              className="object-contain rounded-lg" 
+              className="object-contain rounded-lg"
             />
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
 
       {selectedVideo && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm" onClick={() => setSelectedVideo(null)}>
-          <button className="absolute top-6 right-6 text-white/70 hover:text-white bg-white/10 p-2 rounded-full"><X size={24} /></button>
-          <div className="w-full max-w-5xl aspect-video"><video src={selectedVideo} controls autoPlay className="w-full h-full" /></div>
-        </div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+          onClick={() => setSelectedVideo(null)}
+        >
+          <motion.button
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
+            className="absolute top-6 right-6 text-white/70 hover:text-white bg-white/10 p-2 rounded-full"
+          >
+            <X size={24} />
+          </motion.button>
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            className="w-full max-w-5xl aspect-video"
+          >
+            <video src={selectedVideo} controls autoPlay className="w-full h-full" />
+          </motion.div>
+        </motion.div>
       )}
 
     </div>

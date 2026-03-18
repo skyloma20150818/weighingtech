@@ -38,19 +38,19 @@ export function FeaturesSectionEditor({ config, updateConfig }: FeaturesSectionE
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
           <Star size={15} className="text-yellow-500" />
-          特色功能列表
+          服务和支持列表
         </h3>
         <button
           onClick={addFeature}
           className="bg-[#2B4A7A] text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5"
         >
-          <Plus size={15} /> 添加特性
+          <Plus size={15} /> 服务和支持
         </button>
       </div>
 
       {features.length === 0 ? (
         <div className="text-center py-12 text-slate-400 bg-slate-50 rounded-xl">
-          暂无特性配置，点击&quot;添加特性&quot;开始配置
+          暂无服务和支持配置，点击&quot;添加服务和支持&quot;开始配置
         </div>
       ) : (
         <div className="grid gap-4">
@@ -76,7 +76,7 @@ export function FeaturesSectionEditor({ config, updateConfig }: FeaturesSectionE
                     className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
                     value={feature.title || ''}
                     onChange={(e) => updateFeature(i, 'title', e.target.value)}
-                    placeholder="特性标题"
+                    placeholder="服务和支持标题"
                   />
                 </div>
                 <div>
@@ -95,7 +95,7 @@ export function FeaturesSectionEditor({ config, updateConfig }: FeaturesSectionE
                     rows={2}
                     value={feature.desc || ''}
                     onChange={(e) => updateFeature(i, 'desc', e.target.value)}
-                    placeholder="特性描述内容"
+                    placeholder="服务和支持描述内容"
                   />
                 </div>
                 <div className="col-span-2">

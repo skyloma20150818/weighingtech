@@ -7,8 +7,31 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../../../components/LanguageContext';
 import Product360Viewer from '../../../components/Product360Viewer';
-import { Product, products, categories } from '../../../data';
 import Link from 'next/link';
+
+// 类型定义
+interface Category {
+  id: string;
+  name: string;
+  nameEn: string;
+}
+
+interface Product {
+  id: string;
+  code: string;
+  name: string;
+  nameEn?: string;
+  category: string;
+  description: string;
+  descriptionEn?: string;
+  image: string;
+  has360?: boolean;
+  images360Count?: number;
+  introImages?: string[];
+  specs?: { label: string; labelEn: string; value: string }[];
+  documents?: any[];
+  manualUrl?: string;
+}
 
 interface ProductDetailProps {
   product: Product;
@@ -24,7 +47,8 @@ export default function ProductDetail({ product, consult, recommendations }: Pro
   const isEn = lang === 'en';
   const displayName = isEn && product?.nameEn ? product.nameEn : product?.name;
   const displayDesc = isEn && product?.descriptionEn ? product.descriptionEn : product?.description;
-  const categoryName = categories.find(c => c.id === product?.category)?.name || product?.category;
+  // 从 product 对象获取分类名称，或者使用 product.category 作为后备
+  const categoryName = product?.category || '';
 
   if (!product) {
     return (

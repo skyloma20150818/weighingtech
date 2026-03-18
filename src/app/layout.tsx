@@ -17,6 +17,7 @@ const alibabaPuHuiTi = localFont({
   ],
   variable: "--font-alibaba",
   display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {

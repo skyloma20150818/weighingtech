@@ -64,7 +64,7 @@ export function ContactSectionEditor({
       <div>
         <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
           <Globe size={15} className="text-emerald-500" />
-          在线咨询 (扫码)
+          在线咨询
         </h3>
         <div className="space-y-4 p-4 bg-slate-50 rounded-xl border">
           <div>

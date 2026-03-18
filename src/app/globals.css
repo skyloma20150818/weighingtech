@@ -209,3 +209,27 @@ body {
     letter-spacing: var(--tracking-normal);
   }
 }
+
+/* 打印样式 */
+@media print {
+  nav,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .print-break {
+    page-break-inside: avoid;
+  }
+  
+  a[href]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666;
+  }
+}

@@ -51,7 +51,7 @@ export function SiteConfigEditor({ data, onSave, handleFileUpload }: SiteConfigE
 
   const subTabs = [
     { id: 'hero', label: '首页首屏', icon: Monitor },
-    { id: 'features', label: '特色功能', icon: Star },
+    { id: 'features', label: '服务和支持', icon: Star },
     { id: 'about', label: '关于我们', icon: Users },
     { id: 'contact', label: '联系方式', icon: Phone },
     { id: 'sections', label: '区块标题', icon: LayoutGrid },
@@ -65,11 +65,10 @@ export function SiteConfigEditor({ data, onSave, handleFileUpload }: SiteConfigE
           <button
             key={tab.id}
             onClick={() => setActiveSubTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px ${
-              activeSubTab === tab.id
-                ? 'border-[#2B4A7A] text-[#2B4A7A]'
-                : 'border-transparent text-slate-500 hover:text-slate-700'
-            }`}
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px ${activeSubTab === tab.id
+              ? 'border-[#2B4A7A] text-[#2B4A7A]'
+              : 'border-transparent text-slate-500 hover:text-slate-700'
+              }`}
           >
             <tab.icon size={14} />
             {tab.label}
