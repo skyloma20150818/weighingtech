@@ -22,7 +22,9 @@ export function VideoManager({ data, onSave, handleFileUpload }: VideoManagerPro
       titleEn: 'New Video',
       category: 'all',
       thumbnail: '',
-      videoUrl: ''
+      videoUrl: '',
+      douyinUrl: null,
+      isExternal: false
     });
     onSave(nd);
   };
@@ -61,7 +63,7 @@ export function VideoManager({ data, onSave, handleFileUpload }: VideoManagerPro
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <p className="text-sm text-slate-500">共 {data.solutionVideos.length} 条</p>
+        <p className="text-sm text-slate-500">共 {data.solutionVideos?.length || 0} 条</p>
         <button
           onClick={handleAdd}
           className="bg-[#2B4A7A] text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5"
@@ -70,7 +72,7 @@ export function VideoManager({ data, onSave, handleFileUpload }: VideoManagerPro
         </button>
       </div>
       <div className="space-y-3">
-        {data.solutionVideos.map((item, i) => (
+        {(data.solutionVideos || []).map((item, i) => (
           <div
             key={item.id}
             className="rounded-xl p-4 flex gap-4 group relative hover:bg-slate-50 transition-colors bg-white"
@@ -150,7 +152,7 @@ export function VideoManager({ data, onSave, handleFileUpload }: VideoManagerPro
                   onChange={(e) => handleUpdate(i, 'category', e.target.value)}
                   onBlur={() => onSave(data)}
                 >
-                  {data.solutionCategories.map((c: Category) => (
+                  {(data.solutionCategories || []).map((c: Category) => (
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>

@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import {
   Play, ShieldCheck, Cpu, Server, Monitor, Smartphone,
   CheckCircle2, FlaskConical, Globe, Share2, Phone, ArrowUpRight,
   CheckCircle, Settings, Wrench, Image as ImageIcon, ZoomIn, RefreshCw, X,
-  Volume2, VolumeX, Video
+  Volume2, VolumeX, Video, Target, Wifi, Headphones, Gauge, Boxes,
+  Network, FileCheck, WrenchIcon, Truck, Scale, Activity, Cog
 } from 'lucide-react';
 import Product360Viewer from '../components/Product360Viewer';
 import SmartImage from '../components/SmartImage';
@@ -26,6 +28,8 @@ interface VideoItem {
   category: string;
   thumbnail: string;
   videoUrl: string;
+  douyinUrl?: string | null;
+  isExternal?: boolean;
 }
 
 interface AlbumItem {
@@ -492,7 +496,7 @@ export default function HomeClient({ initialData }: HomeClientProps) {
                   </div>
                   <h4 className="text-white font-medium text-lg line-clamp-2">{lang === 'en' && item.titleEn ? item.titleEn : item.title}</h4>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </motion.div>
         </div>
@@ -516,8 +520,19 @@ export default function HomeClient({ initialData }: HomeClientProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {(features && features.length > 0) ? (
               features.map((f, i) => {
-                const IconComponent = i === 0 ? Cpu : i === 1 ? Monitor : i === 2 ? Server : ShieldCheck;
-                const colors = i === 0 ? 'blue' : i === 1 ? 'emerald' : i === 2 ? 'violet' : 'amber';
+                // 图标名称映射
+                const iconMap: Record<string, any> = {
+                  Target, Wifi, Shield, Headphones, Cpu, Server, Monitor,
+                  Smartphone, Globe, Phone, Settings, Wrench, Scale,
+                  Gauge, Boxes, Network, FileCheck, Truck, Activity, Cog
+                };
+                const IconComponent = iconMap[f.icon] || Target;
+                const colorMap: Record<string, string> = {
+                  blue: 'blue', emerald: 'emerald', violet: 'violet', amber: 'amber',
+                  red: 'red', orange: 'orange', green: 'green', teal: 'teal',
+                  cyan: 'cyan', sky: 'sky', indigo: 'indigo', pink: 'pink'
+                };
+                const colors = colorMap[f.icon?.toLowerCase()] || ['blue', 'emerald', 'violet', 'amber', 'orange', 'red'][i % 6];
                 return (
                   <div key={i} className="bg-white/80 backdrop-blur-md border border-white shadow-xl shadow-slate-200/50 rounded-2xl p-8 hover:-translate-y-1 transition-all duration-300 group">
                     <div className={`w-14 h-14 bg-${colors}-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
@@ -742,7 +757,7 @@ export default function HomeClient({ initialData }: HomeClientProps) {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
-            className="absolute top-6 right-6 text-white/70 hover:text-white bg-white/10 p-2 rounded-full"
+            className="absolute top-6 right-6 text-white/70 hover:text-white bg-white/10 p-2 rounded-full z-10"
           >
             <X size={24} />
           </motion.button>

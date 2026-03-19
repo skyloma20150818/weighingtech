@@ -51,7 +51,7 @@ export function AlbumManager({ data, onSave, handleFileUpload }: AlbumManagerPro
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <p className="text-sm text-slate-500">共 {data.companyAlbum.length} 张</p>
+        <p className="text-sm text-slate-500">共 {data.companyAlbum?.length || 0} 张</p>
         <button
           onClick={handleAdd}
           className="bg-[#2B4A7A] text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5"
@@ -60,7 +60,7 @@ export function AlbumManager({ data, onSave, handleFileUpload }: AlbumManagerPro
         </button>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
-        {data.companyAlbum.map((item, i) => (
+        {(data.companyAlbum || []).map((item, i) => (
           <div key={item.id} className="rounded-xl overflow-hidden bg-slate-50 relative group">
             <div className="aspect-square bg-white relative">
               {item.image ? (
@@ -103,7 +103,7 @@ export function AlbumManager({ data, onSave, handleFileUpload }: AlbumManagerPro
                 value={item.category}
                 onChange={(e) => handleUpdate(i, 'category', e.target.value)}
               >
-                {data.albumCategories.map((c: Category) => (
+                {(data.albumCategories || []).map((c: Category) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>

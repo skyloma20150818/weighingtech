@@ -53,6 +53,8 @@ export interface VideoItem {
   category: string;
   thumbnail: string;
   videoUrl: string;
+  douyinUrl?: string | null;
+  isExternal?: boolean;
 }
 
 export interface Feature {

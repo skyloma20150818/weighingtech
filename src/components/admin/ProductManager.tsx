@@ -67,7 +67,7 @@ export function ProductManager({ data, onSave, handleFileUpload }: ProductManage
         </button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-        {data.products.map((p, i) => (
+        {(data.products || []).map((p, i) => (
           <div
             key={p.id}
             className="rounded-xl p-4 flex gap-3 hover:bg-slate-50 transition-colors group relative border border-transparent hover:border-slate-200"
