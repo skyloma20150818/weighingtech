@@ -7,7 +7,7 @@ import {
   CheckCircle2, FlaskConical, Globe, Share2, Phone, ArrowUpRight,
   CheckCircle, Settings, Wrench, Image as ImageIcon, ZoomIn, RefreshCw, X,
   Volume2, VolumeX, Video, Target, Wifi, Headphones, Gauge, Boxes,
-  Network, FileCheck, WrenchIcon, Truck, Scale, Activity, Cog
+  Network, FileCheck, WrenchIcon, Truck, Scale, Activity, Cog, Shield
 } from 'lucide-react';
 import Product360Viewer from '../components/Product360Viewer';
 import SmartImage from '../components/SmartImage';
